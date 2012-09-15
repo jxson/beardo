@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "glob": "~3.1",
-    "hogan": "1.0.5",
+    "hogan": "1.0.5-dev",
     "sigmund": "1.0.0",
     "lru-cache": "2.0.3"
   },
