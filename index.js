@@ -128,7 +128,33 @@ methods = {
     })
   },
   handler: function handler(req, res, options){
-    var options = options = {}
+    var beardo = this
+      , options = options = {}
+
+    if (options.directory) beardo.directory = options.directory
+
+    return template
+
+    template = function template(name, context, code){
+      // throw if no template name
+      // default code to 200
+
+      beardo.layouts(function(err){
+        if (err) throw err
+
+        beardo.read(name, function(err, template){
+          if (err) throw err
+
+          // create etag with template and data
+          // if cahce headers match return 304 and res.end()
+          // set etag
+          // render template
+          // set status code and content-type
+          // return rendered content
+        })
+      })
+
+    }
   }
 }
 
