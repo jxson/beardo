@@ -1,0 +1,12 @@
+{
+  "name": "beardo",
+  "version": "0.0.0",
+  "description": "The best mustaches were beards first.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "",
+  "license": "BSD"
+}
