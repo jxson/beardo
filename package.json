@@ -1,12 +1,30 @@
 {
   "name": "beardo",
   "version": "0.0.0",
+  "author": "Jason Campbell <jason@js.la> (http://twitter.com/jxson)",
   "description": "The best mustaches were beards first.",
+  "keywords": [
+    "mustache",
+    "templates",
+    "hogan",
+    "express"
+  ],
+  "license": "MIT",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test/*.js --reporter spec"
   },
-  "repository": "",
-  "author": "",
-  "license": "BSD"
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jxson/beardo.git"
+  },
+  "dependencies": {
+    "glob": "~3.1",
+    "hogan": "1.0.5",
+    "sigmund": "1.0.0",
+    "lru-cache": "2.0.3"
+  },
+  "devDependencies": {
+    "mocha": "~1.4.2"
+  }
 }

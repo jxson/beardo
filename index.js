@@ -16,6 +16,8 @@ methods = {
 
     templates[name] = template
 
+    // TODO: compiling and template object creation should be two separate
+    // conearns
     return Object.create({
       render: function(context){
         var context = context || {}
@@ -90,6 +92,12 @@ methods = {
           , stats.size
           ])
         , cached = cache.get(key)
+
+      // making this a method might make things simpler and easier to test, or
+      // just more confusing...
+      //
+      //    if (beardo.cached(stats, callback)) return
+      //
 
       if (cached) {
         // console.log('cached!')
