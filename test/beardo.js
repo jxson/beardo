@@ -104,3 +104,57 @@ describe('beardo.layouts', function(){
     })
   })
 })
+
+describe('beard.handler', function(){
+  before(function(){
+    beardo.directory = path.join(__dirname, './templates')
+  })
+
+  it('exists', function(){
+    assert.equal(typeof beardo.handler, 'function', 'Missing `handle` method')
+  })
+
+  describe('responding with templates', function(){
+    it('responds with rendered content')
+    // * 200
+    // * etag
+    // * content-type === 'text/html'
+    // * date
+    // * connection === 'keep-alive'
+    // * transfer-encoding === 'chunked'
+    // * rendered body
+
+    it('responds to cache requests')
+    // * 304
+    // * no body
+
+    it('responds to cache requests with changed content')
+    // * 200
+    // * has e-tag
+    // * content-type === 'text/html'
+    // * date
+    // * connection === 'keep-alive'
+    // * transfer-encoding === 'chunked'
+    // * rendered body
+
+    it('does NOT override headers')
+    // * 200
+    // * has e-tag
+    // * content-type === 'text/plain'
+    // * date
+    // * connection === 'keep-alive'
+    // * transfer-encoding === 'chunked'
+    // * rendered body
+  })
+
+  describe('responding with non-exisiting template', function(){
+    it('responds with not-found page')
+    // * 400
+    // * has e-tag
+    // * content-type === 'text/plain'
+    // * date
+    // * connection === 'keep-alive'
+    // * transfer-encoding === 'chunked'
+    // * rendered body
+  })
+})

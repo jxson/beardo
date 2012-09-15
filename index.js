@@ -126,6 +126,9 @@ methods = {
         })
       })
     })
+  },
+  handler: function handler(req, res, options){
+    var options = options = {}
   }
 }
 
