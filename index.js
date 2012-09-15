@@ -96,7 +96,7 @@ methods = {
       // making this a method might make things simpler and easier to test, or
       // just more confusing...
       //
-      //    if (beardo.cached(stats, callback)) return
+      //    if (beardo.cache(stats, callback)) return
       //
 
       if (cached) {
