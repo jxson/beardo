@@ -5,6 +5,7 @@ var path = require('path')
   , sigmund = require('sigmund')
   , LRU = require('lru-cache')
   , cache = LRU({ max: 500 })
+  , crypto = require('crypto')
   , templates = {} // move or zap
   , methods
   , attributes
@@ -32,7 +33,9 @@ methods = {
         if (layout) return layout.render(context, templates)
         else return out
       }
-    }, { hulkamania: { value: template } })
+    }, { hulkamania: { value: template }
+       , key: { value: sigmund(template), enumerable: true }
+      })
   },
   scan: function scan(string){
     var scan = hogan.scan(string)
@@ -144,11 +147,11 @@ methods = {
           if (err) throw err
 
           var html = template.render(context)
-            , etag = sigmund({ html: html, context: context })
+            , etag = beardo.etag(template, context)
 
           // TODO: Get a proper/ better etag
-
-          response.setHeader('etag', 'etag')
+          // Only set after 304 resp
+          response.setHeader('etag', etag)
 
           // Do not override
           response.setHeader('content-type', 'text/html')
@@ -166,6 +169,14 @@ methods = {
       })
 
     }
+  },
+  etag: function(template, context){
+    var hash = crypto.createHash('sha1')
+
+    hash.update(template.key)
+    hash.update(sigmund(context || {}))
+
+    return '"' + hash.digest('base64') + '"'
   }
 }
 
