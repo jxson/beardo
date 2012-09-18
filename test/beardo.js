@@ -213,14 +213,38 @@ describe('beard.handler', function(){
       })
     })
 
-    it('responds to cache requests with changed content')
-    // * 200
-    // * has e-tag
-    // * content-type === 'text/html'
-    // * date
-    // * connection === 'keep-alive'
-    // * transfer-encoding === 'chunked'
-    // * rendered body
+    it('responds to cache requests with changed content', function(done){
+      var options = { url: '/heyo'
+          , headers: { 'if-none-match': etag
+            , 'x-changes-context-so-it-shoud-not-cache': 'foo'
+            }
+          }
+
+      var headers = { 'x-changes-context-so-it-shoud-not-cache': 'foo'
+          , host: 'localhost:' + (process.env.PORT || 1337)
+          , connection: 'keep-alive'
+          }
+
+      get(options, function(err, res, body){
+        if (err) return done(err)
+
+        assert.equal(res.statusCode, 200, 'Response is NOT 200 OK')
+        assert.ok(res.headers.etag, 'Missing etag')
+        assert.equal(res.headers['content-type'], 'text/html')
+        assert.ok(res.headers['date'], 'Missing date header')
+        assert.equal(res.headers['connection'], 'keep-alive')
+        assert.equal(res.headers['transfer-encoding'], 'chunked')
+        assert.equal(res.body, [ '<html>'
+        , '<body>'
+        , '<h1>HEYO</h1>'
+        , '<pre>' + JSON.stringify(headers) + '</pre>'
+        , '</body>'
+        , '</html>'
+        ].join('\n'))
+
+        done()
+      })
+    })
 
     it('does NOT override headers')
     // * 200
