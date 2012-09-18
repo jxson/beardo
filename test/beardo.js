@@ -108,7 +108,9 @@ describe('beardo.layouts', function(){
 })
 
 describe('beard.handler', function(){
-  var options = { directory: path.join(__dirname, './templates') }
+  var options = { directory: path.join(__dirname, './templates')
+      , stamp: 'stamp-' + process.pid
+      }
     , port = process.env.PORT || 1337
     , server
     , get
@@ -138,6 +140,9 @@ describe('beard.handler', function(){
       case '/basic':
         res.setHeader('content-type', 'text/plain')
         return res.template('basic', { text: 'foo' })
+
+      case '/stamp':
+        return res.template('stamp', { stamp: options.stamp })
 
       default:
         res.statusCode = 404
@@ -268,7 +273,13 @@ describe('beard.handler', function(){
       })
     })
 
-    it('retains the stamp passed into the options')
+    it('retains the stamp passed into the options', function(done){
+      get('/stamp', function(err, res, body){
+        if (err) return done(err)
+
+        done()
+      })
+    })
 
     it('responds with not-found page')
     // * 400
