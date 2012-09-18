@@ -149,6 +149,21 @@ methods = {
           var html = template.render(context)
             , etag = beardo.etag(template, context)
 
+          // console.log("request.headers['if-none-match']", request.headers['if-none-match'])
+
+          // console.log()
+          // console.log('name', name)
+          // console.log('context', context)
+          // console.log('etag', etag)
+          // console.log()
+
+          if (request.headers['if-none-match'] === etag) {
+            response.statusCode = 304
+            response.end()
+
+            return
+          }
+
           // TODO: Get a proper/ better etag
           // Only set after 304 resp
           response.setHeader('etag', etag)

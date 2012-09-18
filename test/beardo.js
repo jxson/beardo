@@ -114,9 +114,22 @@ describe('beard.handler', function(){
     , get
 
   server = http.createServer(function(req, res) {
-    var headers = JSON.stringify(req.headers)
+    // console.log()
+    // console.log('!!! req.headers', req.headers)
+    // console.log()
 
     res.template = beardo.handler(req, res, options)
+
+    // pluck the if-none-match off the headers, since
+    // we'll be changing that one up.
+    var h = Object.keys(req.headers).filter(function (k) {
+      return k !== 'if-none-match'
+    }).reduce(function (s, k) {
+      s[k] = req.headers[k]
+      return s
+    }, {})
+
+    var headers = JSON.stringify(h)
 
     switch (req.url) {
       case '/heyo':
@@ -128,10 +141,21 @@ describe('beard.handler', function(){
     }
   })
 
-  get = function get(url, callback){
-    var url = 'http://localhost:' + port + url
+  get = function get(options, callback){
+    var options = options || {}
+      , host = 'http://localhost:' + port
 
-    request(url, callback)
+    if (typeof options === 'string') options = { url: host + options }
+    else options.url = host + options.url
+
+    // options.url =
+
+    // console.log('options', options)
+
+    // options.url = options.url ||
+    // var url = 'http://localhost:' + port + url
+
+    request(options, callback)
   }
 
   it('exists', function(){
@@ -139,6 +163,8 @@ describe('beard.handler', function(){
   })
 
   describe('responding with templates', function(){
+    var etag // for the cache tests
+
     before(function(done){
       server.listen(port, done)
     })
@@ -150,6 +176,9 @@ describe('beard.handler', function(){
         var headers = { host: 'localhost:' + (process.env.PORT || 1337)
             , connection: 'keep-alive'
             }
+
+        // Save this for the next test
+        etag = res.headers.etag
 
         assert.equal(res.statusCode, 200, 'Response is NOT 200 OK')
         assert.ok(res.headers.etag, 'Missing etag')
@@ -169,9 +198,20 @@ describe('beard.handler', function(){
       })
     })
 
-    it('responds to cache requests')
-    // * 304
-    // * no body
+    it('responds to cache requests', function(done){
+      var options = { url: '/heyo'
+          , headers: { 'if-none-match': etag }
+          }
+
+      get(options, function(err, res, body){
+        if (err) return done(err)
+
+        assert.equal(res.statusCode, 304)
+        assert.equal(body, undefined)
+
+        done()
+      })
+    })
 
     it('responds to cache requests with changed content')
     // * 200
@@ -190,9 +230,11 @@ describe('beard.handler', function(){
     // * connection === 'keep-alive'
     // * transfer-encoding === 'chunked'
     // * rendered body
-  })
 
-  describe('responding with non-exisiting template', function(){
+    it('retains the stamp passed into the options')
+
+    it('responds with rendered partials')
+
     it('responds with not-found page')
     // * 400
     // * has e-tag
