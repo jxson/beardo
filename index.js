@@ -148,6 +148,10 @@ methods = {
 
           var html = template.render(context)
             , etag = beardo.etag(template, context)
+            , contentType = response.getHeader('content-type')
+
+          // TODO: Get a proper/ better etag
+
 
           // console.log("request.headers['if-none-match']", request.headers['if-none-match'])
 
@@ -164,14 +168,13 @@ methods = {
             return
           }
 
-          // TODO: Get a proper/ better etag
           // Only set after 304 resp
           response.setHeader('etag', etag)
 
           // Do not override
-          response.setHeader('content-type', 'text/html')
+          if (! contentType) response.setHeader('content-type', 'text/html')
 
-          response.statusCode = 200
+          response.statusCode = code || 200
           response.end(html)
 
           // create etag with template and data

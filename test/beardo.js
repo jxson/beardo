@@ -135,6 +135,10 @@ describe('beard.handler', function(){
       case '/heyo':
         return res.template('heyo', { headers: headers, layout: 'html' })
 
+      case '/basic':
+        res.setHeader('content-type', 'text/plain')
+        return res.template('basic', { text: 'foo' })
+
       default:
         res.statusCode = 404
         return res.end()
@@ -246,14 +250,21 @@ describe('beard.handler', function(){
       })
     })
 
-    it('does NOT override headers')
-    // * 200
-    // * has e-tag
-    // * content-type === 'text/plain'
-    // * date
-    // * connection === 'keep-alive'
-    // * transfer-encoding === 'chunked'
-    // * rendered body
+    it('does NOT override headers', function(done){
+      get('/basic', function(err, res, body){
+        if (err) return done(err)
+
+        assert.equal(res.statusCode, 200)
+        assert.ok(res.headers.etag, 'has etag')
+        assert.equal(res.headers['content-type'], 'text/plain')
+        assert.ok(res.headers.date)
+        assert.equal(res.headers.connection, 'keep-alive')
+        assert.equal(res.headers['transfer-encoding'], 'chunked')
+        assert.equal(body, 'basic tom fooery')
+
+        done()
+      })
+    })
 
     it('retains the stamp passed into the options')
 
