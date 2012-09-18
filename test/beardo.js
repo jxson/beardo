@@ -194,6 +194,7 @@ describe('beard.handler', function(){
         , '<body>'
         , '<h1>HEYO</h1>'
         , '<pre>' + JSON.stringify(headers) + '</pre>'
+        , '<p>w007</p>'
         , '</body>'
         , '</html>'
         ].join('\n'))
@@ -242,6 +243,7 @@ describe('beard.handler', function(){
         , '<body>'
         , '<h1>HEYO</h1>'
         , '<pre>' + JSON.stringify(headers) + '</pre>'
+        , '<p>w007</p>'
         , '</body>'
         , '</html>'
         ].join('\n'))
@@ -267,8 +269,6 @@ describe('beard.handler', function(){
     })
 
     it('retains the stamp passed into the options')
-
-    it('responds with rendered partials')
 
     it('responds with not-found page')
     // * 400
