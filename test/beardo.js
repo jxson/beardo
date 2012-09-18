@@ -2,6 +2,8 @@
 var beardo = require('../')
   , path = require('path')
   , assert = require('assert')
+  , http = require('http')
+  , request = require('request')
 
 describe('beardo', function(){
   it('require returns a beardo instance', function(){
@@ -89,7 +91,7 @@ describe('beardo.layouts', function(){
     })
   })
 
-  it('allows templates with layouts', function(){
+  it('allows templates with layouts', function(done){
     beardo.layouts(function(err, layouts){
       if (err) return done(err)
 
@@ -106,23 +108,66 @@ describe('beardo.layouts', function(){
 })
 
 describe('beard.handler', function(){
-  before(function(){
-    beardo.directory = path.join(__dirname, './templates')
+  var options = { directory: path.join(__dirname, './templates') }
+    , port = process.env.PORT || 1337
+    , server
+    , get
+
+  server = http.createServer(function(req, res) {
+    var headers = JSON.stringify(req.headers)
+
+    res.template = beardo.handler(req, res, options)
+
+    switch (req.url) {
+      case '/heyo':
+        return res.template('heyo', { headers: headers, layout: 'html' })
+
+      default:
+        res.statusCode = 404
+        return res.end()
+    }
   })
+
+  get = function get(url, callback){
+    var url = 'http://localhost:' + port + url
+
+    request(url, callback)
+  }
 
   it('exists', function(){
     assert.equal(typeof beardo.handler, 'function', 'Missing `handle` method')
   })
 
   describe('responding with templates', function(){
-    it('responds with rendered content')
-    // * 200
-    // * etag
-    // * content-type === 'text/html'
-    // * date
-    // * connection === 'keep-alive'
-    // * transfer-encoding === 'chunked'
-    // * rendered body
+    before(function(done){
+      server.listen(port, done)
+    })
+
+    it('responds with rendered content', function(done){
+      get('/heyo', function(err, res, body){
+        if (err) return done(err)
+
+        var headers = { host: 'localhost:' + (process.env.PORT || 1337)
+            , connection: 'keep-alive'
+            }
+
+        assert.equal(res.statusCode, 200, 'Response is NOT 200 OK')
+        assert.ok(res.headers.etag, 'Missing etag')
+        assert.equal(res.headers['content-type'], 'text/html')
+        assert.ok(res.headers['date'], 'Missing date header')
+        assert.equal(res.headers['connection'], 'keep-alive')
+        assert.equal(res.headers['transfer-encoding'], 'chunked')
+        assert.equal(res.body, [ '<html>'
+        , '<body>'
+        , '<h1>HEYO</h1>'
+        , '<pre>' + JSON.stringify(headers) + '</pre>'
+        , '</body>'
+        , '</html>'
+        ].join('\n'))
+
+        done()
+      })
+    })
 
     it('responds to cache requests')
     // * 304

@@ -29,7 +29,6 @@ methods = {
           return layout ? out : null
         }
 
-
         if (layout) return layout.render(context, templates)
         else return out
       }
@@ -127,7 +126,7 @@ methods = {
       })
     })
   },
-  handler: function handler(req, res, options){
+  handler: function handler(request, response, options){
     var beardo = this
       , options = options = {}
 
@@ -135,15 +134,27 @@ methods = {
 
     return template
 
-    template = function template(name, context, code){
+    function template(name, context, code){
       // throw if no template name
-      // default code to 200
 
-      beardo.layouts(function(err){
+      beardo.layouts(function(err, layouts){
         if (err) throw err
 
         beardo.read(name, function(err, template){
           if (err) throw err
+
+          var html = template.render(context)
+            , etag = sigmund({ html: html, context: context })
+
+          // TODO: Get a proper/ better etag
+
+          response.setHeader('etag', 'etag')
+
+          // Do not override
+          response.setHeader('content-type', 'text/html')
+
+          response.statusCode = 200
+          response.end(html)
 
           // create etag with template and data
           // if cahce headers match return 304 and res.end()
