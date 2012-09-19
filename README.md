@@ -3,6 +3,9 @@
 Provides an easy way to use mustache templates:
 
     var beardo = require('beardo')
+      , beardopts = { directory: path.join(__dirname, './templates')
+        , stamp: 'stamp-' + process.pid
+        }
 
     http.createServer(function(req, res) {
       res.template = beardo.handler(req, res, beardopts)
