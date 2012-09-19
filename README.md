@@ -1,5 +1,18 @@
 # beardo
 
+Provides an easy way to use mustache templates:
+
+    var beardo = require('beardo')
+
+    http.createServer(function(req, res) {
+      res.template = beardo.handler(req, res, beardopts)
+
+      // Meanwhile
+      return res.template('heyo', { headers: headers, layout: 'html' })
+    })
+
+It's still getting the bugs shaken out, more details and docs soon. Check out the tests for working examples.
+
 # LICENSE (MIT)
 
 Copyright (c) Jason Campbell ("Author")
