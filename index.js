@@ -131,7 +131,8 @@ methods = {
   },
   handler: function handler(request, response, options){
     var beardo = this
-      , options = options = {}
+      , options = options || {}
+      , stamp = options.stamp
 
     if (options.directory) beardo.directory = options.directory
 
@@ -140,14 +141,15 @@ methods = {
     function template(name, context, code){
       // throw if no template name
 
+      if (typeof context === 'number') code = context
+
       beardo.layouts(function(err, layouts){
         if (err) throw err
 
         beardo.read(name, function(err, template){
           if (err) throw err
 
-          var html = template.render(context)
-            , etag = beardo.etag(template, context)
+          var etag = beardo.etag(template, context)
             , contentType = response.getHeader('content-type')
 
           // TODO: Get a proper/ better etag
@@ -170,12 +172,13 @@ methods = {
 
           // Only set after 304 resp
           response.setHeader('etag', etag)
+          if (stamp) response.setHeader('x-beardo-stamp', stamp)
 
           // Do not override
           if (! contentType) response.setHeader('content-type', 'text/html')
 
           response.statusCode = code || 200
-          response.end(html)
+          response.end(template.render(context))
 
           // create etag with template and data
           // if cahce headers match return 304 and res.end()

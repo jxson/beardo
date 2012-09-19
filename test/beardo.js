@@ -144,6 +144,9 @@ describe('beard.handler', function(){
       case '/stamp':
         return res.template('stamp', { stamp: options.stamp })
 
+      case '/404':
+        return res.template('404', 404)
+
       default:
         res.statusCode = 404
         return res.end()
@@ -277,17 +280,33 @@ describe('beard.handler', function(){
       get('/stamp', function(err, res, body){
         if (err) return done(err)
 
+        assert.equal(res.statusCode, 200)
+        assert.ok(res.headers.etag, 'has etag')
+        assert.equal(res.headers['content-type'], 'text/html')
+        assert.ok(res.headers.date)
+        assert.equal(res.headers.connection, 'keep-alive')
+        assert.equal(res.headers['transfer-encoding'], 'chunked')
+        assert.equal(res.headers['x-beardo-stamp'], options.stamp)
+        assert.equal(body, 'stamp = ' + options.stamp)
+
         done()
       })
     })
 
-    it('responds with not-found page')
-    // * 400
-    // * has e-tag
-    // * content-type === 'text/plain'
-    // * date
-    // * connection === 'keep-alive'
-    // * transfer-encoding === 'chunked'
-    // * rendered body
+    it('responds with not-found page', function(done){
+      get('/404', function(err, res, body){
+        if (err) return done(err)
+
+        assert.equal(res.statusCode, 404, 'Bad status code')
+        assert.ok(res.headers.etag)
+        assert.equal(res.headers['content-type'], 'text/html')
+        assert.ok(res.headers.date)
+        assert.equal(res.headers.connection, 'keep-alive')
+        assert.equal(res.headers['transfer-encoding'], 'chunked')
+        assert.equal(body, '<h1>404</h1>')
+
+        done()
+      })
+    })
   })
 })
