@@ -11,7 +11,7 @@ var path = require('path')
   , attributes
 
 methods = {
-  add: function(name, string){
+  add: function(name, key, string){
     var beardo = this
       , template = hogan.compile(string)
 
@@ -34,7 +34,7 @@ methods = {
         else return out
       }
     }, { hulkamania: { value: template }
-       , key: { value: sigmund(template), enumerable: true }
+       , key: { value: key, enumerable: true }
       })
   },
   scan: function scan(string){
@@ -111,7 +111,7 @@ methods = {
       fs.readFile(file, 'utf8', function(err, data){
         if (err) return callback(err)
 
-        var template = beardo.add(name, data)
+        var template = beardo.add(name, key, data)
           , partials = beardo.scan(data)
           , counter = 0
 
@@ -153,16 +153,6 @@ methods = {
             , contentType = response.getHeader('content-type')
 
           // TODO: Get a proper/ better etag
-
-
-          // console.log("request.headers['if-none-match']", request.headers['if-none-match'])
-
-          // console.log()
-          // console.log('name', name)
-          // console.log('context', context)
-          // console.log('etag', etag)
-          // console.log()
-
           if (request.headers['if-none-match'] === etag) {
             response.statusCode = 304
             response.end()
@@ -179,13 +169,6 @@ methods = {
 
           response.statusCode = code || 200
           response.end(template.render(context))
-
-          // create etag with template and data
-          // if cahce headers match return 304 and res.end()
-          // set etag
-          // render template
-          // set status code and content-type
-          // return rendered content
         })
       })
 
