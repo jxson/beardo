@@ -1,6 +1,6 @@
 # beardo
 
-Provides an easy way to use layout aware mustache templates in your [node.js][node] projects. Add mustache files to a templates directory and use `beardo`'s methods to simply asynchronously read and render them as appropriate for your setup.
+Provides an easy way to use layout aware mustache templates in your [node.js][node] projects. Add mustache files to a templates directory and use `beardo`'s methods to asynchronously read and render them as appropriate for your setup.
 
 If you are using one of the http handlers (`beardo.middleware`, `beardo.handler`) [ETags][etags] get automatically added and 304 responses occur based on the `if-none-match` request header.
 
