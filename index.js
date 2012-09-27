@@ -136,6 +136,15 @@ methods = {
 
     if (options.directory) beardo.directory = options.directory
 
+    template.has = function(name){
+      var name = name.match('.mustache') ? name : name + '.mustache'
+        , tpls
+
+      tpls = glob.sync('**/*.mustache', { cwd: beardo.directory })
+
+      return tpls.indexOf(name) > -1
+    }
+
     return template
 
     function template(name, context, code){
