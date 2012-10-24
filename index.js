@@ -1,7 +1,7 @@
 var path = require('path')
   , fs = require('fs')
   , glob = require('glob')
-  , hogan = require('hogan')
+  , hogan = require('hogan.js')
   , sigmund = require('sigmund')
   , LRU = require('lru-cache')
   , cache = LRU({ max: 500 })

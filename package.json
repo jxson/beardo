@@ -1,6 +1,6 @@
 {
   "name": "beardo",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "homepage": "https://github.com/jxson/beardo/",
   "bugs": "https://github.com/jxson/beardo/issues",
   "author": "Jason Campbell <jason@js.la> (http://twitter.com/jxson)",
@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "glob": "~3.1",
-    "hogan": "1.0.5-dev",
+    "hogan.js": "2.0.0",
     "sigmund": "1.0.0",
     "lru-cache": "2.0.3"
   },
