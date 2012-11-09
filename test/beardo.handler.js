@@ -34,7 +34,7 @@ server = http.createServer(function(req, res) {
 
     case '/basic':
       res.setHeader('content-type', 'text/plain')
-      return res.template('basic', { text: 'foo' })
+      return res.template('basic', { text: 'foo', layout: false })
 
     case '/stamp':
       return res.template('stamp', { stamp: beardopts.stamp })
@@ -177,7 +177,7 @@ describe('beard.handler', function(){
       assert.equal(res.headers.connection, 'keep-alive')
       assert.equal(res.headers['transfer-encoding'], 'chunked')
       assert.equal(res.headers['x-beardo-stamp'], beardopts.stamp)
-      assert.equal(body, 'stamp = ' + beardopts.stamp)
+      assert.ok(body.match('stamp = ' + beardopts.stamp))
 
       done()
     })
