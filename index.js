@@ -22,17 +22,17 @@ methods = {
     return Object.create({
       render: function(context){
         var context = context || {}
-          , dontUseLayout = context.layout ? false : true
+          , useLayout = context.layout === false ? false : true
           , template = this
           , layout = templates[path.join('layouts', context.layout || 'default')]
           , out = template.hulkamania.render(context, templates)
 
         context.yield = function yield(){
-          return context.layout ? out : null
+          return useLayout ? out : null
         }
 
-        if (dontUseLayout) return out
-        else return layout.render(context, templates)
+        if (useLayout) return layout.render(context, templates)
+        else return out
       }
     }, { hulkamania: { value: template }
        , key: { value: key, enumerable: true }
