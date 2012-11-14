@@ -159,7 +159,7 @@ methods = {
         beardo.read(name, function(err, template){
           if (err) throw err
 
-          var etag = beardo.etag(template, context)
+          var etag = beardo.etag(template, context, layouts)
             , contentType = response.getHeader('content-type')
 
           // TODO: Get a proper/ better etag
@@ -184,11 +184,12 @@ methods = {
 
     }
   },
-  etag: function(template, context){
+  etag: function(template, context, layouts){
     var hash = crypto.createHash('sha1')
 
     hash.update(template.key)
     hash.update(sigmund(context || {}))
+    hash.update(sigmund(layouts || {}))
 
     return '"' + hash.digest('base64') + '"'
   }
