@@ -188,6 +188,7 @@ methods = {
     var hash = crypto.createHash('sha1')
 
     hash.update(template.key)
+    hash.update(sigmund(template.hulkamania.cache))
     hash.update(sigmund(context || {}))
     hash.update(sigmund(layouts || {}))
 
