@@ -22,7 +22,7 @@
   },
   "dependencies": {
     "glob": "~3.1",
-    "hogan.js": "2.0.0",
+    "hogan.js": "git://github.com/twitter/hogan.js.git",
     "sigmund": "1.0.0",
     "lru-cache": "2.0.3"
   },
