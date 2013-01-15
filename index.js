@@ -151,7 +151,10 @@ methods = {
     function template(name, context, code){
       // throw if no template name
 
-      if (typeof context === 'number') code = context
+      if (typeof context === 'number') {
+        code = context
+        context = {}
+      }
 
       beardo.layouts(function(err, layouts){
         if (err) throw err
