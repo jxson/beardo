@@ -14,7 +14,7 @@
   "main": "index.js",
   "files": [ "index.js" ],
   "scripts": {
-    "test": "mocha test/*.js --reporter spec"
+    "test": "mocha test/*.js --reporter tap"
   },
   "repository": {
     "type": "git",

@@ -63,8 +63,8 @@ describe('beard.handler', function(){
     server.listen(PORT, done)
   })
 
-  after(function(done){
-    server.close(done)
+  after(function(){
+    server.close()
   })
 
   it('exists', function(){
@@ -193,7 +193,7 @@ describe('beard.handler', function(){
       assert.ok(res.headers.date)
       assert.equal(res.headers.connection, 'keep-alive')
       assert.equal(res.headers['transfer-encoding'], 'chunked')
-      assert.equal(body, '<h1>404</h1>')
+      assert.equal(body, '=== <h1>404</h1> ===')
 
       done()
     })
