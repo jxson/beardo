@@ -1,3 +1,5 @@
+[![build status](https://secure.travis-ci.org/jxson/beardo.png)](http://travis-ci.org/jxson/beardo)
+
 # beardo
 
 Provides an easy way to use layout aware mustache templates in your [node.js][node] projects. Add mustache files to a templates directory and use `beardo`'s methods to asynchronously read and render them as appropriate.
