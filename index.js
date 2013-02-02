@@ -3,12 +3,25 @@ var path = require('path')
   , crypto = require('crypto')
   , hogan = require('hogan.js')
   , glob = require('glob')
+  , LRU = require('lru-cache')
+  , readCache = LRU({ max: 500
+    // maxAge 30 mins
+    , maxAge: 1000 * 60 * 30
+    })
+  , compileCache =   LRU({ max: 500
+    // maxAge 30 mins
+    , maxAge: 1000 * 60 * 30
+    })
 
 var attributes = { directory: { enumerable: true
   , writable: true
   , value: path.resolve('templates')
   }
 , templates: { value: {} }
+, cache: { enumerable: true
+  , writable: true
+  , value: true
+  }
 }
 
 module.exports = Object.create({ read: read
@@ -19,13 +32,28 @@ module.exports = Object.create({ read: read
 
 function add(name, string){
   var beardo = this
-    , template = hogan.compile(string)
+    , template
 
-  template.name = name
+  if (beardo.cache === true) {
+    var key = hash(string)
+      , cached = compileCache.get(key)
 
-  beardo.templates[name] = template
+    if (cached) return cached
 
-  return beardo.templates[name]
+    template = hogan.compile(string)
+    template.name = name
+    beardo.templates[name] = template
+
+    readCache.set(key, template)
+
+    return template
+  } else {
+    template = hogan.compile(string)
+    template.name = name
+    beardo.templates[name] = template
+
+    return beardo.templates[name]
+  }
 }
 
 function render(name, context, callback){
@@ -71,17 +99,15 @@ function read(name, callback){
     , file = path.join(beardo.directory, name + '.mustache')
 
   fs.stat(file, function(err, stats){
-    //
-    // var cached = cache.get(key)
+    if (err) return callback(err)
 
-    // making this a method might make things simpler and easier to test, or
-    // just more confusing...
-    //
-    //    if (beardo.cache(stats, callback)) return
-    //
+    var key = hashStats(stats)
 
-    // this should go in a read cache, not a compiled cache?
-    // if (cached) return callback(null, cached)
+    if (beardo.cache === true) {
+      var cached = readCache.get(key)
+
+      if (cached) return callback(null, cached)
+    }
 
     fs.readFile(file, 'utf8', function(err, data){
       if (err) return callback(err)
@@ -100,7 +126,11 @@ function read(name, callback){
 
           queue.splice(queue.indexOf(partial), 1)
 
-          if (queue.length === 0) callback(null, template)
+          if (queue.length === 0) {
+            readCache.set(key, template)
+
+            callback(null, template)
+          }
         })
       })
     })
@@ -115,6 +145,8 @@ function handler(req, res, opts){
 
   if (opts.directory) beardo.directory = opts.directory
   if (opts.dir) beardo.directory = opts.dir
+
+  beardo.cache = opts.cache || false
 
   template.has = function(name){
     var name = name.match('.mustache') ? name : name + '.mustache'
@@ -135,7 +167,6 @@ function handler(req, res, opts){
 
     beardo.render(name, context, function(err, output){
       var etag = hash(output)
-
 
       if (req.headers['if-none-match'] === etag) {
         res.statusCode = 304
@@ -172,4 +203,11 @@ function hash(string){
   .createHash('md5')
   .update(string)
   .digest('base64')
+}
+
+function hashStats(stats){
+  return hash([stats.ino.toString()
+  , stats.mtime.toString()
+  , stats.size.toString()
+  ].join(''))
 }

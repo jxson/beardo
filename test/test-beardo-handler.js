@@ -8,6 +8,7 @@ var beardo = require('../')
   , beardopts = { directory: path.join(__dirname, './templates')
     , stamp: 'stamp-' + process.pid
     , layout: 'default'
+    , cache: true
     }
   , server
   , get
