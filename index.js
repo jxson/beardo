@@ -190,8 +190,8 @@ function hash(string){
 }
 
 function hashStats(stats){
-  return hash([stats.ino
-  , stats.mtime
-  , stats.size
+  return hash([stats.ino.toString()
+  , stats.mtime.toString()
+  , stats.size.toString()
   ].join(''))
 }
