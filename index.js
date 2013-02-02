@@ -7,11 +7,6 @@ var path = require('path')
   , readCache = LRU({ max: 500
     // maxAge 30 mins
     , maxAge: 1000 * 60 * 30
-    , length: function(n){
-        console.log('n', n)
-
-        return 1
-      }
     })
   // , compileCache =
 
@@ -150,7 +145,6 @@ function handler(req, res, opts){
 
     beardo.render(name, context, function(err, output){
       var etag = hash(output)
-
 
       if (req.headers['if-none-match'] === etag) {
         res.statusCode = 304
