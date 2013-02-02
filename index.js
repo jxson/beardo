@@ -8,14 +8,20 @@ var path = require('path')
     // maxAge 30 mins
     , maxAge: 1000 * 60 * 30
     })
-  // , compileCache =
+  , compileCache =   LRU({ max: 500
+    // maxAge 30 mins
+    , maxAge: 1000 * 60 * 30
+    })
 
 var attributes = { directory: { enumerable: true
   , writable: true
   , value: path.resolve('templates')
   }
 , templates: { value: {} }
-, cache: { value: true }
+, cache: { enumerable: true
+  , writable: true
+  , value: true
+  }
 }
 
 module.exports = Object.create({ read: read
@@ -26,13 +32,28 @@ module.exports = Object.create({ read: read
 
 function add(name, string){
   var beardo = this
-    , template = hogan.compile(string)
+    , template
 
-  template.name = name
+  if (beardo.cache === true) {
+    var key = hash(string)
+      , cached = compileCache.get(key)
 
-  beardo.templates[name] = template
+    if (cached) return cached
 
-  return beardo.templates[name]
+    template = hogan.compile(string)
+    template.name = name
+    beardo.templates[name] = template
+
+    readCache.set(key, template)
+
+    return template
+  } else {
+    template = hogan.compile(string)
+    template.name = name
+    beardo.templates[name] = template
+
+    return beardo.templates[name]
+  }
 }
 
 function render(name, context, callback){
@@ -80,9 +101,10 @@ function read(name, callback){
   fs.stat(file, function(err, stats){
     if (err) return callback(err)
 
-    if (beardo.cache) {
-      var key = hashStats(stats)
-        , cached = readCache.get(key)
+    var key = hashStats(stats)
+
+    if (beardo.cache === true) {
+      var cached = readCache.get(key)
 
       if (cached) return callback(null, cached)
     }
@@ -105,7 +127,7 @@ function read(name, callback){
           queue.splice(queue.indexOf(partial), 1)
 
           if (queue.length === 0) {
-            if (beardo.cache) readCache.set(key, template)
+            readCache.set(key, template)
 
             callback(null, template)
           }

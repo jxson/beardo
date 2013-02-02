@@ -1,7 +1,7 @@
 var benchmark = require('benchmark')
   , suite = new benchmark.Suite('beardo')
-  , beardo = require('../index')
   , path = require('path')
+  , beardo = require('../index')
 
 beardo.directory = path.join(__dirname, '..', 'test', 'templates')
 
@@ -30,4 +30,4 @@ suite.add('beardo.read() // caching on', function(deferred) {
 .on('complete', function() {
   console.log('Fastest is ' + this.filter('fastest').pluck('name'));
 })
-.run({ 'async': true });
+.run({ async: true })
