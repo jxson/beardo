@@ -20,6 +20,7 @@ var attributes = { directory: { enumerable: true
   , value: path.resolve('templates')
   }
 , templates: { value: {} }
+, cache: { value: true }
 }
 
 module.exports = Object.create({ read: read
