@@ -12,19 +12,21 @@
   ],
   "license": "MIT",
   "main": "index.js",
-  "files": [ "index.js" ],
+  "files": [
+    "index.js"
+  ],
   "scripts": {
-    "test": "mocha test/*.js --reporter tap"
+    "test": "mocha test/test-*.js --reporter tap"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/jxson/beardo.git"
   },
   "dependencies": {
-    "glob": "~3.1",
-    "hogan.js": "git://github.com/twitter/hogan.js.git",
-    "sigmund": "1.0.0",
-    "lru-cache": "2.0.3"
+    "glob": "3.1.17",
+    "lru-cache": "2.2.2",
+    "hogan.js": "2.0.0",
+    "graceful-fs": "1.1.14"
   },
   "devDependencies": {
     "mocha": "~1.4.2",

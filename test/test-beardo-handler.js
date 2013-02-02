@@ -7,6 +7,7 @@ var beardo = require('../')
   , PORT = process.env.PORT || 1337
   , beardopts = { directory: path.join(__dirname, './templates')
     , stamp: 'stamp-' + process.pid
+    , layout: 'default'
     }
   , server
   , get
@@ -58,7 +59,7 @@ get = function get(options, callback){
   request(options, callback)
 }
 
-describe('beard.handler', function(){
+describe('beardo.handler', function(){
   before(function(done){
     server.listen(PORT, done)
   })
