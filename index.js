@@ -30,6 +30,9 @@ module.exports = Object.create({ read: read
 , add: add
 }, attributes)
 
+// The file arg is used to track the origin of the template
+// manually added templates should not be read so se need a way to check
+// and skip the fs.readFile call
 function add(name, string, file){
   // TODO: throw if args are bad
 
