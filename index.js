@@ -30,7 +30,9 @@ module.exports = Object.create({ read: read
 , add: add
 }, attributes)
 
-function add(name, string){
+function add(name, string, file){
+  // TODO: throw if args are bad
+
   var beardo = this
     , template
 
@@ -42,6 +44,8 @@ function add(name, string){
 
     template = hogan.compile(string)
     template.name = name
+    template.file = file
+
     beardo.templates[name] = template
 
     readCache.set(key, template)
@@ -50,9 +54,11 @@ function add(name, string){
   } else {
     template = hogan.compile(string)
     template.name = name
+    template.file = file
+
     beardo.templates[name] = template
 
-    return beardo.templates[name]
+    return template
   }
 }
 
@@ -70,7 +76,13 @@ function render(name, context, callback){
 
   queue.push(name)
 
-  beardo.read(name, done)
+  // check if this template has been added already and isn't a file
+  // which would mean it needs to be read.
+  if (beardo.templates[name] && ! beardo.templates[name].file) {
+    done(null, beardo.templates[name])
+  } else {
+    beardo.read(name, done)
+  }
 
   function done(err, template){
     if (err) return callback(err)
@@ -112,7 +124,7 @@ function read(name, callback){
     fs.readFile(file, 'utf8', function(err, data){
       if (err) return callback(err)
 
-      var template = beardo.add(name, data)
+      var template = beardo.add(name, data, file)
         , partials = scan(data)
         , queue = []
 
