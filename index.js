@@ -28,6 +28,7 @@ module.exports = Object.create({ read: read
 , render: render
 , handler: handler
 , add: add
+, bundle: bundle
 }, attributes)
 
 // The file arg is used to track the origin of the template
@@ -38,6 +39,7 @@ function add(name, string, file){
 
   var beardo = this
     , template
+    , name = name.replace('.mustache', '')
 
   if (beardo.cache === true) {
     var key = hash(string)
@@ -110,11 +112,15 @@ function render(name, context, callback){
 
 function read(name, callback){
   var beardo = this
-    , name = name.replace('.mustache', '')
-    , file = path.join(beardo.directory, name + '.mustache')
+    , file = path.join(beardo.directory, name)
+
+  // don't add the mustache extension if one already exists
+  if (path.extname(file) === '') file += '.mustache'
 
   fs.stat(file, function(err, stats){
     if (err) return callback(err)
+
+    if (stats.isDirectory()) return
 
     var key = hashStats(stats)
 
@@ -133,6 +139,7 @@ function read(name, callback){
 
       if (partials.length === 0) return callback(null, template)
 
+      // this should get moved into beardo.add function
       partials.forEach(function(partial){
         queue.push(partial)
 
@@ -204,6 +211,75 @@ function handler(req, res, opts){
     })
   }
 }
+
+function bundle(callback){
+  var beardo = this
+    , queue = []
+
+  // Find everything in the templates dir
+  glob('**', { cwd: beardo.directory })
+  .on('match', function(match){
+    var file = path.join(beardo.directory, match)
+
+    queue.push(file)
+
+    fs.stat(file, function(err, stats){
+      if (err) return callback(err)
+
+      // skip direcetories
+      if (stats.isDirectory()) {
+        return queue.splice(queue.indexOf(file), 1)
+      }
+
+      // ignore layouts
+      if (file.match(path.join(beardo.directory, 'layouts'))) {
+        return queue.splice(queue.indexOf(file), 1)
+      }
+
+      beardo.read(match, onRead)
+    })
+  })
+  .on('error', callback)
+
+  function onRead(err, template){
+    if (err) return callback(err)
+
+    queue.splice(queue.indexOf(template.file), 1)
+
+    if (queue.length === 0) {
+      // grab the hogan template module and stringify it
+      var module = path.join(__dirname
+          , 'node_modules'
+          , 'hogan.js'
+          , 'lib'
+          , 'template.js')
+        , context = { templates: []
+          , hogan: { template: fs.readFileSync(module).toString() }
+          }
+        , template = fs.readFileSync(path.join(__dirname, 'bundle.mustache')).toString()
+
+      // This should get moved up into the add method
+      Object.keys(beardo.templates).forEach(function(name){
+        if (name.match('layouts')) return
+
+        // templates['{{ name }}'] = new Hogan.Template({{{ compiled }}});
+        context.templates.push('templates["'+ name +'"] = new Hogan.Template('
+        + hogan.compile(beardo.templates[name].text, { asString: true })
+        + ');'
+        )
+
+        // context.templates.push({ name: name
+        // , compiled: "'" + hogan.compile(beardo.templates[name].text, { asString: true }) + "'"
+        // })
+      })
+
+      var src = hogan.compile(template).render(context)
+
+      callback(null, src)
+    }
+  }
+}
+
 
 function scan(string){
   return hogan.scan(string).filter(function(node){
