@@ -248,9 +248,7 @@ function bundle(callback){
 
     if (queue.length === 0) {
       // grab the hogan template module and stringify it
-      var module = path.join(__dirname
-          , 'node_modules'
-          , 'hogan.js'
+      var module = path.join(require.resolve('hogan.js')
           , 'lib'
           , 'template.js')
         , context = { templates: []
