@@ -1,0 +1,15 @@
+{{#hogan}}
+  {{{ template }}}
+{{/hogan}}
+
+window.templates = {}
+
+{{#templates}}
+  {{{.}}}
+{{/templates}}
+
+function template(name, context){
+  var context = context || {}
+
+  return templates[name].render(context, templates)
+}

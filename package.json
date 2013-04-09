@@ -13,7 +13,8 @@
   "license": "MIT",
   "main": "index.js",
   "files": [
-    "index.js"
+    "index.js",
+    "bundle.mustache"
   ],
   "scripts": {
     "test": "mocha test/test-*.js --reporter tap"
