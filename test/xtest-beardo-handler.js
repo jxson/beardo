@@ -50,28 +50,6 @@ server = http.createServer(function(req, res) {
   }
 })
 
-get = function get(options, callback){
-  var options = options || {}
-    , host = 'http://localhost:' + PORT
-
-  if (typeof options === 'string') options = { url: host + options }
-  else options.url = host + options.url
-
-  request(options, callback)
-}
-
-describe('beardo.handler', function(){
-  before(function(done){
-    server.listen(PORT, done)
-  })
-
-  after(function(){
-    server.close()
-  })
-
-  it('exists', function(){
-    assert.equal(typeof beardo.handler, 'function', 'Missing `handle` method')
-  })
 
   it('responds with rendered content', function(done){
     get('/heyo', function(err, res, body){
@@ -84,12 +62,7 @@ describe('beardo.handler', function(){
       // Save this for the next test
       etag = res.headers.etag
 
-      assert.equal(res.statusCode, 200)
-      assert.ok(res.headers.etag, 'Missing etag')
-      assert.equal(res.headers['content-type'], 'text/html')
-      assert.ok(res.headers['date'])
-      assert.equal(res.headers['connection'], 'keep-alive')
-      assert.equal(res.headers['transfer-encoding'], 'chunked')
+
       assert.equal(body, [ '<html>'
       , '<body>'
       , '<h1>HEYO</h1>'
