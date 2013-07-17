@@ -16,7 +16,7 @@ describe('res.tempate = beardo(req, res, options)', function(){
       res.template = beardo(req, res, { dirname: dirname })
 
       switch (req.url) {
-        case 'vanilla-usage':
+        case '/vanilla-usage':
           res.template('vanilla')
           break
         default:
