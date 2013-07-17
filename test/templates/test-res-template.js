@@ -1,4 +1,8 @@
 
+var beardo = require('../')
+  , assert = require('assert')
+  , request = require('supertest')
+
 describe('res.tempate = beardo(req, res, options)', function(){
   it('successfully renders content')
 
