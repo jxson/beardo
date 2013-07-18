@@ -32,4 +32,14 @@ describe('beardo.render', function(){
       done()
     })
   })
+
+  it('renders manually added templates', function(done){
+    beardo(directory)
+    .add('user', '<p>hello {{ name }}</p>')
+    .render('user', { name: 'jxson' }, function(err, output){
+      if (err) return done(err)
+      assert.ok(output.match(/hello jxson/))
+      done()
+    })
+  })
 })

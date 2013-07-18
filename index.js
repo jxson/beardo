@@ -146,7 +146,14 @@ Beardo.prototype.read = function(name){
 
   fs.createReadStream(filename, { encoding: 'utf8' })
   // proxy errors to beardo
-  .on('error', function(err){ beardo.emit('error', err) })
+  .on('error', function(err){
+    // It is possible to get to this point while trying to render a manually
+    // added template. If that is the case do the right thing, otherwise proxy
+    // the error to beardo
+    if (err.code === 'ENOENT' && beardo.templates[name]) {
+      end(beardo.templates[name])
+    } else beardo.emit('error', err)
+  })
   .pipe(cs(end))
 
   function end(buffer){
@@ -203,6 +210,8 @@ Beardo.prototype.add = function(identifier, buffer){
   partials(data).forEach(function(template){
     beardo.read(template)
   })
+
+  return beardo
 
   function normalize(filename){
     return filename
