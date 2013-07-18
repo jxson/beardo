@@ -1,8 +1,6 @@
 
 var http = require('http')
 
-  , colors = require('colors')
-
 module.exports = function(){
   var directory
     , options
