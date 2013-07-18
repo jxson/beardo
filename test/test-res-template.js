@@ -87,7 +87,8 @@ describe('res.tempate = beardo(req, res, options)', function(){
     .expect('content-type', 'text/plain')
     .expect(200, function(err, res){
       if (err) return done(err)
-      assert.equal(res.text.replace('\n', '').trim(), '=== blah blah Chewbacca ===')
+      assert.equal(res.text.replace('\n', '').trim()
+      , '=== blah blah Chewbacca ===')
       done()
     })
   })
