@@ -19,6 +19,9 @@ describe('res.tempate = beardo(req, res, options)', function(){
         case '/vanilla-usage':
           res.template('vanilla')
           break
+        case '/vanilla-with-data':
+          res.template('vanilla', { title: 'vanilla with data', foo: 'bar' })
+          break
         default:
           res.statusCode = 404
           res.end()
@@ -52,7 +55,22 @@ describe('res.tempate = beardo(req, res, options)', function(){
     })
   })
 
-  it('successfully renders templates with data')
+  it('successfully renders templates with data', function(done){
+    request(server)
+    .get('/vanilla-with-data')
+    .expect('etag', /(.*)/)
+    .expect('content-type', 'text/html')
+    .expect(200, function(err, res){
+      if (err) return done(err)
+
+      var $ = cheerio.load(res.text)
+
+      assert.equal($('title').text(), 'Just testing: vanilla with data')
+      assert.equal($('h1').text(), 'Vanilla - foobar')
+
+      done()
+    })
+  })
 
   it('does not override pre-existing headers')
 
