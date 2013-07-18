@@ -62,6 +62,11 @@ Beardo.prototype.decorate = function(req, res){
 
   // the res.template decorator
   function template(name, context, status){
+    if (typeof context === 'number') {
+      status = context
+      context = {}
+    }
+
     // TODO: req.pipe(beardo('foo', options)).pipe(res)
     beardo.render(name, context, function(err, output){
       if (err) throw err // TODO: do something better with this
@@ -75,7 +80,7 @@ Beardo.prototype.decorate = function(req, res){
         res.setHeader('content-type', 'text/html')
       }
 
-      res.statusCode = res.statusCode || status || 200
+      res.statusCode = status || 200
       res.write(output)
       res.end()
     })

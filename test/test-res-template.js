@@ -30,6 +30,9 @@ describe('res.tempate = beardo(req, res, options)', function(){
           res.setHeader('content-type', 'text/plain')
           res.template('random-text', { name: 'Chewbacca', layout: false })
           break
+        case '/teapot':
+          res.template('teapot', 418)
+          break
         default:
           res.statusCode = 404
           res.end()
@@ -105,7 +108,12 @@ describe('res.tempate = beardo(req, res, options)', function(){
     })
   })
 
-  it('optionally sets res.statusCode')
+  it('optionally sets res.statusCode', function(done){
+    request(server)
+    .get('/teapot')
+    .expect('etag', /(.*)/)
+    .expect(418, done)
+  })
 
   describe('cache headers and responses', function(){
     it('hanldes if-none-match request headers')
