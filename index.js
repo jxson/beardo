@@ -18,6 +18,11 @@ module.exports = function(){
     }
   }
 
+  if (! options) {
+    options = {}
+    options.directory = directory
+  }
+
   var beardo = new Beardo(options)
 
   if (req && res) return beardo.decorate(req, res)
@@ -96,7 +101,11 @@ Beardo.prototype.decorate = function(req, res){
 
 Beardo.prototype.render = function(name, context, callback){
   var beardo = this
-    , context = context || {}
+
+  if (typeof context === 'function') {
+    callback = context
+    context = {}
+  }
 
   if (context.layout === undefined) context.layout = 'default'
 
@@ -136,6 +145,8 @@ Beardo.prototype.read = function(name){
   beardo.queue.push(filename)
 
   fs.createReadStream(filename, { encoding: 'utf8' })
+  // proxy errors to beardo
+  .on('error', function(err){ beardo.emit('error', err) })
   .pipe(cs(end))
 
   function end(buffer){
