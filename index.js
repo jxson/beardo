@@ -1,8 +1,7 @@
 
-var http = require('http')
-
 module.exports = function(){
-  var directory
+  var http = require('http')
+    , directory
     , options
     , req
     , res
@@ -45,8 +44,9 @@ function Beardo(options){
   for (var key in options) {
     if (! key in allowed) return
 
-    if (key === 'directory') beardo.options.directory = path.resolve(options.directory)
-    else beardo.options[key] = options[key]
+    if (key === 'directory') {
+      beardo.options.directory = path.resolve(options.directory)
+    } else beardo.options[key] = options[key]
   }
 
   EE.call(beardo)
@@ -161,7 +161,8 @@ Beardo.prototype.find = function(name){
   return template
 }
 
-// takes an identifier and a string or buffer and adds it to the template hashes
+// takes an identifier and a string or buffer and adds it to the template
+// hashes
 Beardo.prototype.add = function(identifier, buffer){
   var beardo = this
     , isBuffer = require('buffer').Buffer.isBuffer
@@ -172,6 +173,13 @@ Beardo.prototype.add = function(identifier, buffer){
   // This is needed to pass into render functions for accessing the relatively
   // named templates
   beardo.partials[normalize(identifier)] = beardo.templates[identifier]
+
+  // scan for partials
+  // TODO: check that this wont get stuck in a recursive loop (end will never
+  // fire) if you have paritals linking to each other
+  partials(data).forEach(function(template){
+    beardo.read(template)
+  })
 
   function normalize(filename){
     return filename
@@ -188,3 +196,19 @@ function hash(string){
   .digest('base64')
 }
 
+function partials(text){
+  var hogan = require('hogan.js')
+
+  return hogan
+  .scan(text)
+  .filter(filter)
+  .map(map)
+
+  // grab all the partials
+  function filter(node){ return node.tag === '>' }
+
+  // return a list of just thier names, no null values
+  function map(tag){
+    return tag.n
+  }
+}

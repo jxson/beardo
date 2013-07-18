@@ -45,11 +45,8 @@ describe('res.tempate = beardo(req, res, options)', function(){
       assert.ok($('h1').text().match(/Vanilla/)
       , 'Should render vanilla.mustache')
 
-      assert.equal($('p').length, 2
-      , 'Should render partials')
-
-      assert.equal($('p').length, 3
-      , 'Should render nested partials')
+      assert.ok($('p').length >= 2, 'Should render partials')
+      assert.ok($('p').length >= 3, 'Should render nested partials')
 
       done()
     })
