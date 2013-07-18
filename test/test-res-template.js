@@ -22,6 +22,14 @@ describe('res.tempate = beardo(req, res, options)', function(){
         case '/vanilla-with-data':
           res.template('vanilla', { title: 'vanilla with data', foo: 'bar' })
           break
+        case '/plain-text':
+          res.setHeader('content-type', 'text/plain')
+          res.template('random-text', { name: 'Chewbacca', layout: 'text' })
+          break
+        case '/plain-text-no-layout':
+          res.setHeader('content-type', 'text/plain')
+          res.template('random-text', { name: 'Chewbacca', layout: false })
+          break
         default:
           res.statusCode = 404
           res.end()
@@ -72,7 +80,29 @@ describe('res.tempate = beardo(req, res, options)', function(){
     })
   })
 
-  it('does not override pre-existing headers')
+  it('does not override pre-existing headers', function(done){
+    request(server)
+    .get('/plain-text')
+    .expect('etag', /(.*)/)
+    .expect('content-type', 'text/plain')
+    .expect(200, function(err, res){
+      if (err) return done(err)
+      assert.equal(res.text.replace('\n', '').trim(), '=== blah blah Chewbacca ===')
+      done()
+    })
+  })
+
+  it('allows { layout: false }', function(done){
+    request(server)
+    .get('/plain-text-no-layout')
+    .expect('etag', /(.*)/)
+    .expect('content-type', 'text/plain')
+    .expect(200, function(err, res){
+      if (err) return done(err)
+      assert.equal(res.text.trim(), 'blah blah Chewbacca')
+      done()
+    })
+  })
 
   it('optionally sets res.statusCode')
 
