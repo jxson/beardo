@@ -33,6 +33,13 @@ describe('res.tempate = beardo(req, res, options)', function(){
         case '/teapot':
           res.template('teapot', 418)
           break
+        case '/etags':
+          var data = { title: 'etags'
+              , foo: req.headers['x-foo'] || 'bar'
+              }
+
+          res.template('vanilla', data)
+          break
         default:
           res.statusCode = 404
           res.end()
@@ -116,8 +123,31 @@ describe('res.tempate = beardo(req, res, options)', function(){
   })
 
   describe('cache headers and responses', function(){
-    it('hanldes if-none-match request headers')
+    var etag
 
-    it('does NOT 304 changed content')
+    before(function(done){
+      request(server)
+      .get('/etags')
+      .expect('etag', /(.*)/)
+      .expect(200, function(err, res){
+        etag = res.headers['etag']
+        done(err)
+      })
+    })
+
+    it('hanldes if-none-match request headers', function(done){
+      request(server)
+      .get('/etags')
+      .set('if-none-match', etag)
+      .expect(304, done)
+    })
+
+    it('does NOT 304 changed content', function(done){
+      request(server)
+      .get('/etags')
+      .set('x-foo', 'baz')
+      .set('if-none-match', etag)
+      .expect(200, done)
+    })
   })
 })

@@ -73,6 +73,13 @@ Beardo.prototype.decorate = function(req, res){
 
       var etag = hash(output)
 
+      if (req.headers['if-none-match'] === etag) {
+        res.statusCode = 304
+        res.end()
+        return
+      }
+
+      // Only set after 304 resp
       res.setHeader('etag', etag)
 
       // Don't override content-type header
