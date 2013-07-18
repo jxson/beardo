@@ -101,6 +101,7 @@ Beardo.prototype.decorate = function(req, res){
 
 Beardo.prototype.render = function(name, context, callback){
   var beardo = this
+    , context = context || {}
 
   if (typeof context === 'function') {
     callback = context
