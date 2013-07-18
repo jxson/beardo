@@ -10,10 +10,10 @@ describe('res.tempate = beardo(req, res, options)', function(){
   before(function(){
     var http = require('http')
       , path = require('path')
-      , dirname = path.resolve(__dirname, './templates')
+      , directory = path.resolve(__dirname, './templates')
 
     server = http.createServer(function(req, res){
-      res.template = beardo(req, res, { dirname: dirname })
+      res.template = beardo(req, res, { directory: directory })
 
       switch (req.url) {
         case '/vanilla-usage':
@@ -29,14 +29,14 @@ describe('res.tempate = beardo(req, res, options)', function(){
   it('successfully renders content from templates', function(done){
     request(server)
     .get('/vanilla-usage')
-    .expect('etag')
+    .expect('etag', /(.*)/)
     .expect('content-type', 'text/html')
     .expect(200, function(err, res){
       if (err) return done(err)
 
       var $ = cheerio.load(res.text)
 
-      console.log('$.html()', $.html())
+      // console.log('$.html()', $.html())
 
       done()
     })
