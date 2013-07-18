@@ -127,14 +127,7 @@ Beardo.prototype.read = function(name){
   .pipe(cs(end))
 
   function end(buffer){
-    var isBuffer = require('buffer').Buffer.isBuffer
-      , data = isBuffer(buffer) ? buffer.toString() : buffer
-      , hogan = require('hogan.js')
-
-    beardo.templates[filename] = hogan.compile(data)
-    // This is needed to pass into render functions for accessing the relatively
-    // named templates
-    beardo.partials[normalize(filename)] = beardo.templates[filename]
+    beardo.add(filename, buffer)
 
     // remove this page from the queue
     var index = beardo.queue.indexOf(filename)
@@ -145,13 +138,6 @@ Beardo.prototype.read = function(name){
       beardo.isReading = false
       beardo.emit('end')
     }
-  }
-
-  function normalize(filename){
-    return filename
-    .replace(beardo.options.directory, '')
-    .replace(/^\//, '')
-    .replace('.mustache', '')
   }
 }
 
@@ -173,6 +159,26 @@ Beardo.prototype.find = function(name){
   }
 
   return template
+}
+
+// takes an identifier and a string or buffer and adds it to the template hashes
+Beardo.prototype.add = function(identifier, buffer){
+  var beardo = this
+    , isBuffer = require('buffer').Buffer.isBuffer
+    , data = isBuffer(buffer) ? buffer.toString() : buffer
+    , hogan = require('hogan.js')
+
+  beardo.templates[identifier] = hogan.compile(data)
+  // This is needed to pass into render functions for accessing the relatively
+  // named templates
+  beardo.partials[normalize(identifier)] = beardo.templates[identifier]
+
+  function normalize(filename){
+    return filename
+    .replace(beardo.options.directory, '')
+    .replace(/^\//, '')
+    .replace('.mustache', '')
+  }
 }
 
 function hash(string){
