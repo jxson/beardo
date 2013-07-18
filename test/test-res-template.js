@@ -36,7 +36,20 @@ describe('res.tempate = beardo(req, res, options)', function(){
 
       var $ = cheerio.load(res.text)
 
-      // console.log('$.html()', $.html())
+      assert.ok($('#default-layout').length
+      , 'Should be wrapped in the layout')
+
+      assert.equal($('header, footer').length, 2
+      , 'Should render partials in layouts')
+
+      assert.ok($('h1').text().match(/Vanilla/)
+      , 'Should render vanilla.mustache')
+
+      assert.equal($('p').length, 2
+      , 'Should render partials')
+
+      assert.equal($('p').length, 3
+      , 'Should render nested partials')
 
       done()
     })
