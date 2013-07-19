@@ -4,7 +4,7 @@ var beardo = require('../')
   , path = require('path')
   , directory = path.resolve(__dirname, './templates')
 
-describe('beardo.render', function(){
+describe('beardo(...).render', function(){
   it('renders templates', function(done){
     beardo(directory)
     .render('random-text.mustache', function(err, output){
