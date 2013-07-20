@@ -29,11 +29,11 @@ module.exports = function(){
   else return beardo
 }
 
-var path = require('path')
-  , EE = require('events').EventEmitter
+var EE = require('events').EventEmitter
 
 function Beardo(options){
   var beardo = this
+    , path = require('path')
 
   beardo.templates = {}
   beardo.partials = {}
@@ -101,6 +101,7 @@ Beardo.prototype.decorate = function(req, res){
 
 Beardo.prototype.render = function(name, context, callback){
   var beardo = this
+    , path = require('path')
     , context = context || {}
 
   if (typeof context === 'function') {
@@ -137,11 +138,14 @@ Beardo.prototype.read = function(name){
   var beardo = this
     , path = require('path')
     , fs = require('graceful-fs')
-    , filename = path.join(beardo.options.directory, name)
+    , filename = name.match(beardo.options.directory) ? name : path.join(beardo.options.directory, name)
     , cs = require('concat-stream')
 
   // don't add the mustache extension if one already exists
   if (path.extname(filename) === '') filename += '.mustache'
+
+  // don't queue if it's already pending
+  if (filename in beardo.queue) return
 
   beardo.queue.push(filename)
 
@@ -175,6 +179,7 @@ Beardo.prototype.read = function(name){
 Beardo.prototype.find = function(name){
   var beardo = this
     , template = beardo.templates[name]
+    , path = require('path')
 
   // this should never happen outside of development/ regressions
   if (beardo.isReading) throw new Error('No finding while reading!')
@@ -222,6 +227,72 @@ Beardo.prototype.add = function(identifier, buffer){
   }
 }
 
+// TODO: make the bundle stream compatible
+Beardo.prototype.bundle = function(callback){
+  var beardo = this
+    , powerwalk = require('powerwalk')
+    , through = require('through')
+    , path = require('path')
+    , layouts = path.join(beardo.options.directory, 'layouts')
+    , queue = []
+
+  powerwalk(beardo.options.directory)
+  .pipe(through(write, end))
+
+  function write(filename){
+    // ignore layouts
+    if (! filename.match(layouts)) queue.push(filename)
+  }
+
+  function end(){
+    beardo.on('error', callback)
+    beardo.on('end', finish)
+
+    queue.forEach(function(filename){
+      beardo.read(filename)
+    })
+  }
+
+  function finish(){
+    var fs = require('graceful-fs')
+
+    fs.readFile('./bundle.js.mustache', 'utf8', function(err, data){
+      if (err) return beardo.emit('error', err)
+
+      var hogan = require('hogan.js')
+        , template = hogan.compile(data)
+        , partials = []
+        , precompiled
+        , src
+
+
+      Object.keys(beardo.partials).forEach(function(name){
+        var text = beardo.partials[name].text
+          , options = { asString: true }
+          , compiled = hogan.compile(text, options)
+
+        partials.push('"' + name + '": '
+        + 'new Hogan.Template(' + compiled + ')'
+        )
+      })
+
+      var module = path.resolve(require.resolve('hogan.js'), '../template.js')
+
+      fs.readFile(module, 'utf8', function(err, data){
+        if (err) return beardo.emit('error', err)
+
+        src = template.render({ hogan: data
+        , partials: '{' + partials.join(', ') + '}'
+        })
+
+        callback(null, src)
+      })
+    })
+  }
+}
+
+// Helpers
+
 function hash(string){
   return require('crypto')
   .createHash('md5')
@@ -241,7 +312,5 @@ function partials(text){
   function filter(node){ return node.tag === '>' }
 
   // return a list of just thier names, no null values
-  function map(tag){
-    return tag.n
-  }
+  function map(tag){ return tag.n }
 }
