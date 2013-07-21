@@ -1,26 +1,41 @@
-[![build status](https://secure.travis-ci.org/jxson/beardo.png)](http://travis-ci.org/jxson/beardo)
+# beardo [![build status](https://secure.travis-ci.org/jxson/beardo.png)](http://travis-ci.org/jxson/beardo) [![NPM version](https://badge.fury.io/js/beardo.png)](http://badge.fury.io/js/beardo) [![Dependency Status](https://david-dm.org/jxson/beardo.png)](https://david-dm.org/jxson/beardo)
 
-# beardo
+> A mustache template utility for Node.js servers/ projects.
 
-Provides an easy way to use layout aware mustache templates in your [node.js][node] projects. Add mustache files to a templates directory and use `beardo`'s methods to asynchronously read and render them as appropriate.
+The best mustaches were beards first. This module provides simple, layout aware APIs for working with mustache templates. Add mustache files to a templates directory and use `beardo` to lazily and asynchronosly read and render them as appropriate.
 
-If you are using one of the http handlers (`beardo.middleware`, `beardo.handler`) [ETags][etags] get automatically added and 304 responses occur based on the `if-none-match` request header.
+# EXAMPLES
 
-# beardo.handler(res, req, [options])
-
-Adds a [Templar][templar] style response handler.
+Decorate the http `res` obejct with a Templar compatible `res.template` method. Etags and 304 responses are automatically handled.
 
     var beardo = require('beardo')
-      , beardopts = { directory: path.join(__dirname, './templates')
-        , stamp: 'stamp-' + process.pid
-        }
+      , http = require('http')
+      , path = require('path')
+      , options = { directory: path.resolve(__dirname, './templates') }
 
-    http.createServer(function(req, res) {
-      res.template = beardo.handler(req, res, beardopts)
+    http.createServer(function(req, res){
+      res.template = beardo(req, res, options)
 
-      // Meanwhile
-      res.template('heyo', { foo: 'bar, layout: 'html' })
+      // Then later you can render `templates/heyo.mustache` with
+      res.tempalte('heyo')
     })
+
+Templates by default will get wrapped in `templates/layouts/default.mustache`. If you want to change the layout add it to the context object as the second argument.
+
+    res.template('heyo', { foo: 'bar', layout: 'custom-layout' })
+
+Alternatively if you dont want a layout at all set it to `false`:
+
+    res.template('heyo', { layout: false })
+
+
+    beardo(directory)
+    .render('random-text', function(err, output){
+      if (err) return done(err)
+      assert.ok(output.match(/blah blah/))
+      done()
+    })
+
 
 ## Options
 
@@ -40,3 +55,53 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [node]: http://nodejs.org
 [etags]: #
 [templar]: #
+
+
+
+
+
+README
+
+Blockquote project summary
+
+
+Brightens your day by opening a browser tab to a music video
+
+
+When showing up to a project, potential users want to quickly determine what it offers them. Using a markdown blockquote at the top of your README is a clear way to display a summary of your project to a new user.
+
+Minimal Usage
+
+Once you've convinced the user to try out your project, it is valuable to give them instructions of how to use it with minimal configuration. Later in your documentation you can embellish in more extensive examples, but it is important to get a new user started quickly so that they get invested in the project.
+
+Explicity define the API
+
+Users don't want to look at your source code to learn how to use your project. By explicitly defining parameter types, descriptions, and default values(if any) of your methods parameters/properties, you can save yourself time responding to issues submitted by confused users. I like to use the same syntax as the node.js docs when defining methods, here is an example method definition for mymodule:
+
+mymodule(inputString, [color], [callback])
+When defining parameters, I like to first define its type, then any default values, then describe it. Sometimes the parameter warrants an example use case to illustrate its usage relative to other parameters. Here are example parameter definitions for mymodule:
+
+inputString
+Type: String
+
+Description of the inputString parameter.
+
+color
+Type: String Default: 'blue'
+
+Description of the color parameter.
+
+callback
+Type: Function
+
+Description of the callback parameter. This parameter can be used as the second parameter if the color is omitted. Here is an example which illustrates this usage:
+
+mymodule('Hello World!', function () {
+  console.log('I am in a callback :)');
+});
+
+
+Issue Driven Development
+
+Issues are the most transparent way to keep track of a project's development. They are a great place to solicit feedback from contributors and users before implementing new features, as well as a place to track to-dos. Having issues on a project that suggest future development invites new contributors to get involved and resolve those issues.
+
