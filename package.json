@@ -6,12 +6,19 @@
   "author": "Jason Campbell <jason@js.la> (http://twitter.com/jxson)",
   "description": "The best mustaches were beards first.",
   "keywords": [
+    "res.template",
     "mustache",
     "templates",
     "hogan"
   ],
   "license": "MIT",
   "main": "index.js",
+  "files": [
+    "index.js",
+    "bundle.js.mustache",
+    "README.md",
+    "test"
+  ]
   "scripts": {
     "test": "mocha test/test-*.js"
   },
