@@ -4,11 +4,11 @@
 
 > A mustache template utility for Node.js servers/ projects.
 
-The best mustaches were beards first. This module provides simple, layout aware APIs for working with mustache templates. Add mustache files to a templates directory and use `beardo` to lazily and asynchronously read and render them as appropriate.
+The best mustaches were beards first. The `beardo` module provides simple, layout aware APIs for working with mustache templates. Add mustache files to a templates directory and use `beardo` to lazily and asynchronously read and render them as appropriate.
 
-# Example: res.template() 
+# Example: res.template()
 
-Decorate the http `res` obeject with a Templar compatible `res.template` method. Etags and 304 responses will get automatically handled.
+Decorate the http `res` object with a Templar compatible `res.template` method. Etags and 304 responses will get automatically handled.
 
     var beardo = require('beardo')
       , http = require('http')
@@ -18,7 +18,7 @@ Decorate the http `res` obeject with a Templar compatible `res.template` method.
     http.createServer(function(req, res){
       res.template = beardo(req, res, options)
 
-      // Then later you can render `templates/heyo.mustache` with an optional context
+      // Then later you can render `templates/heyo.mustache` with an optional context object
       res.template('heyo', { foo: 'bar' })
     })
 
@@ -37,9 +37,20 @@ You can use beardo directly to render templates in other contexts or if you don'
 
 		beardo(directory)
     .render('my-template', { foo: 'bar' }, function(err, output){
-      if (err) throw err 
+      if (err) throw err
 			console.log(output)
     })
+
+# Directory Structure
+
+The directory that holds all the templates can be named whatever you want but at a minimum should contain a layouts subdirectory with a default.mustache file:
+
+    .
+    └─ templates
+        └─ layouts
+            └─ default.mustache
+
+Additional templates can be added anywhere in the templates directory (even subdirectories). Layouts need to use the `yield` helper to render their contents properly, see the examples for some guidance.
 
 # API
 
@@ -51,7 +62,7 @@ Decorate `res` with a template method for rendering mustache files templates in 
 
 ### res.template(templateName, [data], [statusCode])
 
-* templateName: A string that is the name, relative to the `options.directory` of the mustache template. 
+* templateName: A string that is the name, relative to the `options.directory` of the mustache template.
 * data: the optional data object to pass to the templates. If you want to change the layout or not have one add the layout key to this object.
 * statusCode: the optional http status code, defaults to 200
 
@@ -75,7 +86,7 @@ options:
 
 Render a template in `options.directory`
 
-* templateName: A string that is the name, relative to the `options.directory` of the mustache template. 
+* templateName: A string that is the name, relative to the `options.directory` of the mustache template.
 * data: the optional data object to pass to the templates. If you want to change the layout or not have one add the layout key to this object.
 * callback: The function that will be called when the output from the template is rendered. Arguments for the call back are:
 	* error: Error|null
@@ -107,7 +118,7 @@ Creates a pre-compiled bundle of all the templates that can be loaded into a scr
 
 Once your bundle is ready and has been added to your client it will add a template function to the `window` that works similarly to the `res` decorator.
 
-* templateName: A string that is the name, relative to the `options.directory` of the mustache template. 
+* templateName: A string that is the name, relative to the `options.directory` of the mustache template.
 * data: the optional data object to pass to the templates. Layouts are excluded from the bundle, if you think this should be changed let me know.
 
 NOTE: I am still churning on this one, if you have comments or feedback please let me know. The bundle is something I hacked in a while ago and found it incredibly useful but I am sure it can be refined, I know the client-side implementation needs some work and could be made in a way that is compatible with other development flows. If you have any feedback regarding this don't hesitate to create an issue or get in touch.
@@ -116,7 +127,7 @@ NOTE: I am still churning on this one, if you have comments or feedback please l
 
 You can run the tests through standard npm commands.
 
-		$ npm install # installe dependencies 
+		$ npm install # installe dependencies
 		$ npm test 		# run the tests
 
 Currently there are no specific tests for the browser bundle, I approximate the environment in a standard test.
