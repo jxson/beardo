@@ -113,10 +113,12 @@ Asynchronously render a template in `options.directory`.
 
 ## b.add(name, content)
 
-Allows you to dynamically add templates that `beardo` can then render, this is handy for instances where you might have template data in other places that are not the `options.directory`
+* `name`: the name of the template being added
+    * Type: `String`
+* `content`: The content of the template
+    * Type: `String`
 
-* name: the name of the template being added
-* content: A string of the template
+Allows you to dynamically add templates that `beardo` can then render, this is handy for instances where you might have template data in other places that are not the `options.directory`
 
     beardo(directory)
     .add('user', '<p>hello {{ name }}</p>')
@@ -125,22 +127,46 @@ Allows you to dynamically add templates that `beardo` can then render, this is h
       console.log(output) // '<p>hello jxson</p>
     })
 
-## EXPERIMENTAL: b.bundle(callback)
+## b.bundle(callback)
 
-Creates a pre-compiled bundle of all the templates that can be loaded into a script tag and used client-side.
+> Stability: 1 - Experimental
 
-* callback: A function that is called when the bundle is read and pre-compiled.
-  * error: Error|null
-  * output: A string of the pre-compiled templates which should be saved and then included in a client-side script tag.
+* `callback`: A function that is called when the bundle is ready.
+    * Type: Function
+    * Arguments: (err, data) , where data is a string of JavaScript that is the pre-compiled templates and a function for rendering them.
 
-### window.template(templateName, [data])
+Asynchronously reads and pre-compiles all templates into a bundle of JS that can be loaded into a script tag and used client-side.
 
-Once your bundle is ready and has been added to your client it will add a template function to the `window` that works similarly to the `res` decorator.
+    beardo(directory)
+    .bundle(function(err, data){
+      if (err) throw err
 
-* templateName: A string that is the name, relative to the `options.directory` of the mustache template.
-* data: the optional data object to pass to the templates. Layouts are excluded from the bundle, if you think this should be changed let me know.
+      // Once the bundle is created you can drop it into a file (or respond
+      // to an http request with it's content)
+      var fs = require('fs')
 
-NOTE: I am still churning on this one, if you have comments or feedback please let me know. The bundle is something I hacked in a while ago and found it incredibly useful but I am sure it can be refined, I know the client-side implementation needs some work and could be made in a way that is compatible with other development flows. If you have any feedback regarding this don't hesitate to create an issue or get in touch.
+      fs.writeFile('templates.js', data, function (err) {
+        if (err) throw err
+        console.log('template bundle saved!')
+      })
+    })
+
+### window.template(name, [data])
+
+* `name`: The name of the template relative to the `options.directory`.
+    * Type: `String`
+* `data`: An optional data object to pass to the templates. Layouts are excluded from the bundle, if you think this should be changed please creat an issue with details on your use case.
+    * Type: `Object`
+    * Default: `{}`
+
+Once the template bundle is loaded into the client you can use `window.template(...)` to render templates in your client-side JS.
+
+    var rendered = window.template('hiya', { name: 'jxson' })
+
+    console.log(rendered)
+
+
+NOTE: The bundle is something I hacked in a while ago and found it incredibly useful. I am still churning on the bundle and the client-side API it expsoses, if you have comments or feedback please let me know.
 
 # DEVELOPMENT
 
@@ -151,7 +177,7 @@ You can run the tests through standard npm commands.
 
 Currently there are no specific tests for the browser bundle, I approximate the environment in a standard test.
 
-## CONTRIBUTING
+# CONTRIBUTING
 
 Want to help? Send a pull request, I'll give you commit access and we can make this better.
 
