@@ -18,7 +18,8 @@ Decorate the http `res` object with a Templar compatible `res.template` method. 
     http.createServer(function(req, res){
       res.template = beardo(req, res, options)
 
-      // Then later you can render `templates/heyo.mustache` with an optional context object
+      // Meanwhile you can render `templates/heyo.mustache` with an optional
+      // context object.
       res.template('heyo', { foo: 'bar' })
     })
 
@@ -35,10 +36,10 @@ Alternatively if you don't want a layout at all set it to `false`:
 
 You can use beardo directly to render templates in other contexts or if you don't want to decorate the res object:
 
-		beardo(directory)
+    beardo(directory)
     .render('my-template', { foo: 'bar' }, function(err, output){
       if (err) throw err
-			console.log(output)
+      console.log(output)
     })
 
 # Directory Structure
@@ -54,43 +55,61 @@ Additional templates can be added anywhere in the templates directory (even subd
 
 # API
 
-		var beardo = require('beardo')
+    var beardo = require('beardo')
 
 ## res.template = beardo(req, res, options)
 
 Decorate `res` with a template method for rendering mustache files templates in `options.directory`. This method will automatically handle Etags and 304 responses.
 
-### res.template(templateName, [data], [statusCode])
+### res.template(name, [data], [statusCode])
 
-* templateName: A string that is the name, relative to the `options.directory` of the mustache template.
-* data: the optional data object to pass to the templates. If you want to change the layout or not have one add the layout key to this object.
-* statusCode: the optional http status code, defaults to 200
+* `name`: The template name/location relative to the `options.directory`
+    * Type: `String`
+* `data`: the optional data object to pass to the templates. If you want to change or ignore layouts this is the place to do it.
+    * Type: `Object`
+    * Default: `{ layout: 'default' }`
+* `statusCode`: the optional http status code
+    * Type: `Number`
+    * Default: 200 or 304 if there is a matching if-none-match header for the previous response's Etag headers.
 
-`res.template` will read all the necessary files (including layouts and partials) and by default will respond with the rendered output as `text/html` with a 200 ok. To render a different content-type set the header ahead of calling `res.template` for example:
+`res.template` will read all the necessary files (including layouts and partials) and by default will respond with the rendered output as `text/html` with a 200 ok. To render a different content-type set the header before calling `res.template` for example:
 
-		res.setHeader('content-type', 'text/plain')
-		res.template('random-text')
+    res.setHeader('content-type', 'text/plain')
+    res.template('my-plain-text-template')
 
 Note: Since beardo only works with mustache, template names get normalized in a way that makes appending '.mustache' to them unnecessary. For example these two calls will  effectively be the same: `res.template('vanilla')`, `res.template('vanilla.mustache')`
 
 ## Standard beardo instance
 
-		var b = beardo(options)
+    var b = beardo(options)
 
-options:
+### Options
 
-* directory: The path to the directory where the templates reside. Defaults to `process.cwd + '/templates'`, you should explicitly set this.
-* cache: Boolean which can toggle the behavior for how the underlying cacheing works. Set to `false` if you want the templates re-read on every request (ideal for development). By default this is set to `true` saving extra fs calls for templates that have been cached.read calls on subsequent requests.
+* `directory`: The path to the directory where the templates reside. Even though there is a default you should explicitly set this value.
+    * Type: `path`
+    * Default: `process.cwd + '/templates'`
+* `cache`: Toggles the cacheing. Set to `false` if you want the templates re-read on every call to `b.render()` (ideal for development). By default this is set to `true` saving extra fs calls and template compilation for previously rendered templates.
+    * Type: `Boolean`
+    * Default: `true`
 
-## b.render(templateName, [data], callback)
+## b.render(name, [data], callback)
 
-Render a template in `options.directory`
+* `name`: The name/location relative to the `options.directory` of the template to render.
+    * Type: `String`
+* `data`: the optional data object to pass to the templates. If you want to change or ignore layouts this is the place to do it.
+    * Type: `Object`
+    * Default: `{ layout: 'default' }`
+* `callback`: The function that will be called when the output from the template is rendered.
+    * Type: `Function`
+    * Arguments: `(err, output)`, where output is the rendered contents of the template.
 
-* templateName: A string that is the name, relative to the `options.directory` of the mustache template.
-* data: the optional data object to pass to the templates. If you want to change the layout or not have one add the layout key to this object.
-* callback: The function that will be called when the output from the template is rendered. Arguments for the call back are:
-	* error: Error|null
-	* output: A string of the rendered output of the template.
+Asynchronously render a template in `options.directory`.
+
+    beardo(directory)
+    .render('my-template', { foo: 'bar' }, function(err, output){
+      if (err) throw err
+      console.log(output)
+    })
 
 ## b.add(name, content)
 
@@ -103,7 +122,7 @@ Allows you to dynamically add templates that `beardo` can then render, this is h
     .add('user', '<p>hello {{ name }}</p>')
     .render('user', { name: 'jxson' }, function(err, output){
       if (err) return done(err)
-			console.log(output)	// '<p>hello jxson</p>
+      console.log(output) // '<p>hello jxson</p>
     })
 
 ## EXPERIMENTAL: b.bundle(callback)
@@ -111,8 +130,8 @@ Allows you to dynamically add templates that `beardo` can then render, this is h
 Creates a pre-compiled bundle of all the templates that can be loaded into a script tag and used client-side.
 
 * callback: A function that is called when the bundle is read and pre-compiled.
-	* error: Error|null
-	* output: A string of the pre-compiled templates which should be saved and then included in a client-side script tag.
+  * error: Error|null
+  * output: A string of the pre-compiled templates which should be saved and then included in a client-side script tag.
 
 ### window.template(templateName, [data])
 
@@ -127,8 +146,8 @@ NOTE: I am still churning on this one, if you have comments or feedback please l
 
 You can run the tests through standard npm commands.
 
-		$ npm install # installe dependencies
-		$ npm test 		# run the tests
+    $ npm install   # install dependencies
+    $ npm test      # run the tests
 
 Currently there are no specific tests for the browser bundle, I approximate the environment in a standard test.
 
