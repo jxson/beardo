@@ -63,6 +63,8 @@ Beardo.prototype.__proto__ = EE.prototype
 Beardo.prototype.decorate = function(req, res){
   var beardo = this
 
+  template.has = has
+
   return template
 
   // the res.template decorator
@@ -96,6 +98,14 @@ Beardo.prototype.decorate = function(req, res){
       res.write(output)
       res.end()
     })
+  }
+
+  function has(name){
+    var glob = require('glob')
+      , name = name.match('.mustache') ? name : name + '.mustache'
+      , templates = glob.sync('**/*.mustache', { cwd: beardo.options.directory })
+
+    return templates.indexOf(name) > -1
   }
 }
 
