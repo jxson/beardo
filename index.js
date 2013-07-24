@@ -204,6 +204,9 @@ Beardo.prototype.add = function(identifier, buffer){
     , isBuffer = require('buffer').Buffer.isBuffer
     , data = isBuffer(buffer) ? buffer.toString() : buffer
     , hogan = require('hogan.js')
+    , assert = require('assert')
+
+  assert.ok(data, 'The template "' + identifier + '" can NOT be empty')
 
   beardo.templates[identifier] = hogan.compile(data)
   // This is needed to pass into render functions for accessing the relatively
