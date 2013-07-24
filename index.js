@@ -120,7 +120,7 @@ Beardo.prototype.render = function(name, context, callback){
   beardo.read(name)
 
   beardo.on('end', function(){
-    var layout = beardo.find(path.join('layouts', context.layout))
+    var layout = context.layout ? beardo.find(path.join('layouts', context.layout)) : null
       , template = beardo.find(name)
       , output = template.render(context, beardo.partials)
 
