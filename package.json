@@ -18,7 +18,7 @@
     "bundle.js.mustache",
     "README.md",
     "test"
-  ]
+  ],
   "scripts": {
     "test": "mocha test/test-*.js"
   },
