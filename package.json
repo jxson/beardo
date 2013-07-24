@@ -4,7 +4,7 @@
   "homepage": "https://github.com/jxson/beardo/",
   "bugs": "https://github.com/jxson/beardo/issues",
   "author": "Jason Campbell <jason@js.la> (http://twitter.com/jxson)",
-  "description": "The best mustaches were beards first.",
+  "description": "A mustache template utility for Node.js servers/ projects.",
   "keywords": [
     "res.template",
     "mustache",
