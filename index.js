@@ -268,8 +268,10 @@ Beardo.prototype.bundle = function(callback){
 
   function finish(){
     var fs = require('graceful-fs')
+    var path = require('path')
+    var template = path.resolve(__dirname, './bundle.js.mustache')
 
-    fs.readFile('./bundle.js.mustache', 'utf8', function(err, data){
+    fs.readFile(template, 'utf8', function(err, data){
       if (err) return beardo.emit('error', err)
 
       var hogan = require('hogan.js')
