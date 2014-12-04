@@ -21,7 +21,10 @@
     "url": "git://github.com/jxson/beardo.git"
   },
   "dependencies": {
+    "debug": "^2.1.0",
+    "hogan.js": "^3.0.2"
   },
   "devDependencies": {
+    "tape": "^3.0.3"
   }
 }
