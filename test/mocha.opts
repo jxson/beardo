@@ -1,3 +1,0 @@
---bail
---reporter spec
---globals CookieAccessInfo,Cookie,CookieJar

@@ -12,32 +12,16 @@
     "hogan"
   ],
   "license": "MIT",
-  "main": "index.js",
-  "files": [
-    "index.js",
-    "bundle.js.mustache",
-    "README.md",
-    "test"
-  ],
+  "main": "./beardo.js",
   "scripts": {
-    "test": "mocha test/test-*.js"
+    "test": "tape test/test-*.js"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/jxson/beardo.git"
   },
   "dependencies": {
-    "graceful-fs": "~2.0.0",
-    "concat-stream": "~1.0.0",
-    "hogan.js": "~2.0.0",
-    "powerwalk": "~0.1.4",
-    "through": "~2.3.4",
-    "glob": "~3.2.6"
   },
   "devDependencies": {
-    "mocha": "~1.12.0",
-    "supertest": "~0.7.1",
-    "cheerio": "~0.12.0",
-    "error-page": "0.0.6"
   }
 }
