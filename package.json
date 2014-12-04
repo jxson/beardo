@@ -3,8 +3,8 @@
   "version": "1.1.1",
   "homepage": "https://github.com/jxson/beardo/",
   "bugs": "https://github.com/jxson/beardo/issues",
-  "author": "Jason Campbell <jason@js.la> (http://twitter.com/jxson)",
-  "description": "A mustache template utility for Node.js servers/ projects.",
+  "author": "Jason Campbell <jasoncampbell@google.com> (https://artifact.sh)",
+  "description": "A mustache template utility for Node.js.",
   "keywords": [
     "res.template",
     "mustache",
