@@ -21,7 +21,9 @@
     "url": "git://github.com/jxson/beardo.git"
   },
   "dependencies": {
+    "async-cache": "^0.1.5",
     "debug": "^2.1.0",
+    "graceful-fs": "^3.0.5",
     "hogan.js": "^3.0.2"
   },
   "devDependencies": {
