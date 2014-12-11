@@ -24,14 +24,6 @@ function Beardo(basedir) {
   beardo.files = cache({
     load: read
   })
-
-  function read(key, callback) {
-    debug('prime cache for %s', key)
-
-    var json = JSON.parse(key)
-
-    fs.readFile(json.file, 'utf8', callback)
-  }
 }
 
 Beardo.prototype.resolve = function(key) {
@@ -124,6 +116,14 @@ Beardo.prototype.read = function(key, callback) {
       beardo.get(key, callback)
     })
   })
+}
+
+function read(key, callback) {
+  debug('prime cache for %s', key)
+
+  var json = JSON.parse(key)
+
+  fs.readFile(json.file, 'utf8', callback)
 }
 
 function hash(file, stats) {
