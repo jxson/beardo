@@ -36,6 +36,10 @@ Beardo.prototype.resolve = function(key) {
   var beardo = this
   var file = path.resolve(beardo.basedir, key)
 
+  if (path.extname(file) === '') {
+    file += '.mustache'
+  }
+
   return file
 }
 

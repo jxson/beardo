@@ -39,7 +39,7 @@ test('b.render(name, callback)', function(t) {
   })
 })
 
-test.skip('b.render(name, callback)', function(t) {
+test('b.render(name, callback)', function(t) {
   beardo(dir)
   .render('random-text', function(err, output) {
     t.error(err)
