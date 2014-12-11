@@ -5,6 +5,8 @@ var cache = require('async-cache')
 var path = require('path')
 var fs = require('graceful-fs')
 var crypto = require('crypto')
+var errno = require('errno')
+var format = require('util').format
 
 module.exports = Beardo
 
@@ -109,16 +111,12 @@ Beardo.prototype.read = function(key, callback) {
   debug('needs data from fs: %s', file)
 
   fs.stat(file, function(err, stats) {
-    if (err) return callback(err)
+    if (err) return callback(ferror(err, 'reading template "%s"', key))
 
     var index = hash(file, stats)
 
     beardo.files.get(index, function(err, data) {
-      if (err) return callback(err)
-
-      // // This should be nicer yeah?
-      // if (err && err.code === 'ENOENT') err.name = 'Template Not Found'
-      // if (err) return callback(err)
+      if (err) return callback(ferror(err, 'reading template "%s"', key))
 
       debug('loaded from cache: %s', key)
 
@@ -139,4 +137,19 @@ function hash(file, stats) {
     file: file,
     etag: h.digest('hex')
   })
+}
+
+function ferror(err, template) {
+  var description = errno.errno[err.errno].description
+  var code = errno.errno[err.errno].code
+  var fargs = Array.prototype.slice.call(arguments, 1)
+
+  err.message = format.apply(null, fargs)
+  err.message += format('\n %s: %s', code, description)
+
+  if (err.path) {
+    err.message += format(' [%s]', err.path)
+  }
+
+  return err
 }

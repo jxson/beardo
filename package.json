@@ -23,6 +23,7 @@
   "dependencies": {
     "async-cache": "^0.1.5",
     "debug": "^2.1.0",
+    "errno": "^0.1.1",
     "graceful-fs": "^3.0.5",
     "hogan.js": "^3.0.2"
   },

@@ -3,6 +3,7 @@ var test = require('tape')
 var beardo = require('../')
 var path = require('path')
 var dir = path.resolve(__dirname, './templates')
+var errno = require('errno')
 
 test('beardo()', function(t) {
   t.equal(typeof beardo, 'function')
@@ -44,6 +45,19 @@ test('b.render(name, callback)', function(t) {
   .render('random-text', function(err, output) {
     t.error(err)
     t.equal(output, 'blah blah \n')
+    t.end()
+  })
+})
+
+test('error: non-existing template', function(t) {
+  const ENOENT = errno.code.ENOENT
+
+  beardo(dir)
+  .render('does-not-exist', function(err, output) {
+    t.ok(err, 'should error')
+    t.ok(err.message.match('does-not-exist'), 'should have a nice message')
+    t.equal(err.errno, ENOENT.errno)
+    t.equal(err.code, ENOENT.code)
     t.end()
   })
 })
