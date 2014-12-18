@@ -3,10 +3,10 @@
   <title>Just testing: {{ title }}</title>
 </head>
 
-<body id="default-layout">
+<body data-layout="default">
   {{>shared/header}}
 
-  {{{ yield }}}
+  {{{ layout-content }}}
 
   {{>shared/footer}}
 </body>

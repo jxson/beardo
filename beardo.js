@@ -1,26 +1,32 @@
 
-var hogan = require('hogan.js')
-var debug = require('debug')('beardo')
+var template = require('./template')
 var cache = require('async-cache')
 var path = require('path')
 var fs = require('graceful-fs')
 var crypto = require('crypto')
 var errno = require('errno')
 var format = require('util').format
+var through = require('through2')
+var debug = require('debug')('beardo')
 
 module.exports = Beardo
 
-function Beardo(basedir) {
-  if (!(this instanceof Beardo)) return new Beardo(basedir)
-
-  if (! basedir) {
-    throw new Error('basedir is required.')
-  }
+function Beardo(options) {
+  if (!(this instanceof Beardo)) return new Beardo(options)
 
   var beardo = this
 
-  beardo.templates = {}
-  beardo.basedir = path.resolve(basedir)
+  if (typeof options === 'string') {
+    options = { basedir: options }
+  }
+
+  if (! options.basedir) {
+    throw new Error('options.basedir is required.')
+  }
+
+  beardo.basedir = path.resolve(options.basedir)
+  beardo.layout = options.layout
+  beardo.templates = {} // keeps track of manually added templates
   beardo.files = cache({
     load: read
   })
@@ -40,7 +46,9 @@ Beardo.prototype.resolve = function(key) {
 Beardo.prototype.set = function (key, value) {
   var beardo = this
 
-  beardo.templates[key] = hogan.compile(value)
+  debug('set: %s', key)
+
+  beardo.templates[key] = template(key, value)
 
   // allows chaining like: t.set(k, v).render(ctx, cb)
   return {
@@ -55,26 +63,97 @@ Beardo.prototype.has = function(key) {
 
 Beardo.prototype.get = function(key, callback) {
   var beardo = this
+  var templates = {}
 
   debug('get: %s', key)
 
-  if (beardo.has(key)) {
-    debug('has %s', key)
+  queue(beardo, callback)
+  .on('error', callback)
+  .on('data', function ontemplate(template) {
+    templates[template.key] = template
+  })
+  .on('end', function onend() {
+    debug('queue ended')
+    callback(null, templates[key], templates)
+  })
+  .write(key)
 
-    var template = beardo.templates[key]
 
-    if (template.partials.length) {
-      debug('crap, it has partials')
-    } else {
-      callback(null, template)
-    }
-  } else {
-    beardo.read(key, callback)
+  // queue.write(key)
+
+  // Is it manually added?
+
+  // On the fs
+
+
+  // if (beardo.has(key)) {
+  //   debug('has %s', key)
+  //
+  //   var template = beardo.templates[key]
+  //
+  //   if (template.partials.length) {
+  //     debug('crap, it has partials %o', Object.keys(template.partials))
+  //
+  //     template.partials.forEach(function(partial) {
+  //       queue.write(partial)
+  //     })
+  //   } else {
+  //     // callback(null, template)
+  //     debug('no partials')
+  //     queue.end()
+  //   }
+  // } else {
+  //   beardo.read(key, function(err, data) {
+  //       //
+  //
+  //     beardo.set(key, data)
+  //     beardo.get(key, queue)
+  //   })
+  // }
+}
+
+
+function queue(beardo) {
+  var queue = through.obj(write, flush)
+  var debug = require('debug')('queue')
+
+  debug('creating queue')
+
+  queue.templates = {}
+
+  return queue
+
+  function write(chunk, enc, callback) {
+    var queue = this
+    var key = chunk.toString()
+
+    debug('queued - %s', chunk)
+
+    beardo.read(key, function onread(err, template) {
+      if (err) return callback(err)
+
+      queue.push(template)
+      callback()
+
+      if (template.partials.length === 0) {
+        queue.end()
+      } else {
+        template.partials.forEach(function(partial) {
+          queue.write(partial)
+        })
+      }
+    })
+  }
+
+  function flush(callback) {
+    debug('flushing')
+    callback()
   }
 }
 
 Beardo.prototype.render = function(key, context, callback) {
   var beardo = this
+  var layout
 
   debug('render: %s', key)
 
@@ -85,20 +164,40 @@ Beardo.prototype.render = function(key, context, callback) {
 
   callback = callback.bind(beardo)
 
+  // context.layout could be === false
+  if (context.layout === undefined) context.layout = 'default'
+  if (beardo.layout !== undefined) context.layout = beardo.default
 
+  if (context.layout) {
+    layout = path.join('layouts', context.layout)
+  }
 
   beardo.get(key, function(err, template, partials) {
     if (err) return callback(err)
 
+    debug('got %s', key)
+
     var output = template.render(context, partials)
 
-    callback(err, output)
+    if (! layout) {
+      return callback(err, output)
+    } else {
+      context.layout = false
+      context['layout-content'] = output
+
+      beardo.render(layout, context, callback)
+    }
   })
 }
 
 Beardo.prototype.read = function(key, callback) {
   var beardo = this
   var file = beardo.resolve(key)
+
+  // manually added via b.set(k, v)
+  if (beardo.has(key)) {
+    return callback(null, beardo.templates[key])
+  }
 
   debug('needs data from fs: %s', file)
 
@@ -112,8 +211,7 @@ Beardo.prototype.read = function(key, callback) {
 
       debug('loaded from cache: %s', key)
 
-      beardo.set(key, data)
-      beardo.get(key, callback)
+      callback(null, template(key, data))
     })
   })
 }

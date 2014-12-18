@@ -25,9 +25,11 @@
     "debug": "^2.1.0",
     "errno": "^0.1.1",
     "graceful-fs": "^3.0.5",
-    "hogan.js": "^3.0.2"
+    "hogan.js": "^3.0.2",
+    "through2": "^0.6.3"
   },
   "devDependencies": {
+    "cheerio": "^0.18.0",
     "coveralls": "^2.11.2",
     "istanbul": "^0.3.4",
     "tape": "^3.0.3"

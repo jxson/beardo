@@ -10,6 +10,8 @@ The best mustaches were beards first. The `beardo` module provides simple, layou
 
 # Example: res.template()
 
+{{{ layout-content }}}
+
 Decorate the http `res` object with a [Templar][templar] compatible `res.template` method. [Etags][etag] and 304 responses will be automatically handled.
 
     var beardo = require('beardo')
