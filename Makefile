@@ -31,4 +31,4 @@ release:
 	git push && git push --tags
 	npm publish
 
-.PHONY: clean release test
+.PHONY: clean release test travis

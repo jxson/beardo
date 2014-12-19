@@ -4,3 +4,4 @@ node_js:
 env:
   global:
   - secure: "lf8terN5sHAidEBObOLw8P8WXyjQRhzdQNQKyuwuODfbV5XAzdYEkQ7p7Z9i9RLPQHHzlp/P+m986hHBaGCn+2I/b9cl2fHmhyQPDYPxq0TGzU2cdQwevKH5Jkj+xE3eYCYx+cvtZ0nF21qXNwTQkycIIkXZgLrcKCeOMywdEp0="
+script: make travis
