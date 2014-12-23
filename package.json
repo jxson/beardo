@@ -4,7 +4,7 @@
   "homepage": "https://github.com/jxson/beardo/",
   "bugs": "https://github.com/jxson/beardo/issues",
   "author": "Jason Campbell <jasoncampbell@google.com> (https://artifact.sh)",
-  "description": "A mustache template utility for Node.js.",
+  "description": "An async mustache template utility for Node.js.",
   "keywords": [
     "res.template",
     "mustache",
@@ -12,7 +12,7 @@
     "hogan"
   ],
   "license": "MIT",
-  "main": "./beardo.js",
+  "main": "./lib/beardo.js",
   "scripts": {
     "test": "tape test/test-*.js"
   },
