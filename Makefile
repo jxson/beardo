@@ -9,7 +9,7 @@ node_modules: package.json
 	@npm install
 	@touch node_modules
 
-coverage: beardo.js test/test-*.js node_modules
+coverage: lib/*.js test/test-*.js node_modules
 	@istanbul cover --report html --print detail ./test/index.js
 
 coveralls: coverage
