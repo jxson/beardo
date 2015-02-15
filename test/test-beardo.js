@@ -45,7 +45,7 @@ test('b.render(name, callback)', function(t) {
   })
   .render('random-text.mustache', function(err, output) {
     t.error(err)
-    t.equal(output, 'blah blah \n')
+    t.equal(output, 'Rawr rawr \n')
     t.end()
   })
 })
@@ -57,7 +57,7 @@ test('b.render(name, callback)', function(t) {
   })
   .render('random-text', function(err, output) {
     t.error(err)
-    t.equal(output, 'blah blah \n')
+    t.equal(output, 'Rawr rawr \n')
     t.end()
   })
 })

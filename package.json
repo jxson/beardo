@@ -26,12 +26,14 @@
     "errno": "^0.1.1",
     "graceful-fs": "^3.0.5",
     "hogan.js": "^3.0.2",
+    "run-series": "^1.0.2",
+    "tape": "^3.5.0",
     "through2": "^0.6.3"
   },
   "devDependencies": {
     "cheerio": "^0.18.0",
+    "concat-stream": "^1.4.7",
     "coveralls": "^2.11.2",
-    "istanbul": "^0.3.5",
-    "tape": "^3.0.3"
+    "istanbul": "^0.3.5"
   }
 }
