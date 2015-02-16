@@ -1,6 +1,6 @@
 
 var test = require('tape')
-var beardo = require('../')
+var beardo = require('../').ctor
 var path = require('path')
 var dir = path.resolve(__dirname, './templates')
 var errno = require('errno')
