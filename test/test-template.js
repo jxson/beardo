@@ -12,10 +12,10 @@ test('var template = beardo(options)', function(t) {
 })
 
 test('template(name, callback)', function(t) {
-  template('lorem-ipsum', function(err, output) {
+  template('coffee-ipsum', function(err, output) {
     t.error(err, 'template(...) should not error')
     t.ok(output, 'should have output')
-    t.ok(output.match('Lorem ipsum'), 'should render template output')
+    t.ok(output.match('Coffee ipsum'), 'should render template output')
     t.end()
   })
 })

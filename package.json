@@ -12,9 +12,9 @@
     "hogan"
   ],
   "license": "MIT",
-  "main": "./lib/beardo.js",
+  "main": "./lib/index.js",
   "scripts": {
-    "test": "tape test/test-*.js"
+    "test": "tape test/index.js"
   },
   "repository": {
     "type": "git",
