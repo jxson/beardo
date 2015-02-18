@@ -3,5 +3,6 @@ node_js:
 - 0.1
 env:
   global:
-  - secure: "lf8terN5sHAidEBObOLw8P8WXyjQRhzdQNQKyuwuODfbV5XAzdYEkQ7p7Z9i9RLPQHHzlp/P+m986hHBaGCn+2I/b9cl2fHmhyQPDYPxq0TGzU2cdQwevKH5Jkj+xE3eYCYx+cvtZ0nF21qXNwTQkycIIkXZgLrcKCeOMywdEp0="
+    # travis encrypt COVERALLS_REPO_TOKEN=foo
+  - secure: "Tv3PXlLr33ETZpDaXw1k1ofh+20fIvvPVA3fLR5FtnQUdlLuUQsE+FIqyt9QgN++/zj1gSiNif/aHASo3qQJ6aZiX0cOcLJZ9CHG7b8eBHy6luEGplBsJaFLE9awRhx/d1pe9kCRY3NyY8UkrbGQp+RN5KHBhPrJrzusRTxjopg="
 script: make travis
