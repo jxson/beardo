@@ -4,7 +4,9 @@
 
 > A mustache template utility for Node.js servers/ projects.
 
-[![build status](https://secure.travis-ci.org/jxson/beardo.png)](http://travis-ci.org/jxson/beardo) [![Dependency Status](https://david-dm.org/jxson/beardo.png)](https://david-dm.org/jxson/beardo)
+[![build][travis-badge]][travis-link]
+[![coverage][coverage-badge]][coverage-link]
+[![dependencies][dependency-badge]][dependency-link]
 
 The best mustaches were beards first. The `beardo` module provides simple, layout aware APIs for working with [mustache templates][mustache]. Add your template files to a directory and use `beardo` to lazily and asynchronously read and render them as appropriate.
 
@@ -220,3 +222,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [issues]: https://github.com/jxson/beardo/issues
 [pr]: https://github.com/jxson/beardo/pulls
 [twitter]: https://twitter.com/jxson
+[travis-badge]: https://secure.travis-ci.org/jxson/beardo.png
+[travis-link]: http://travis-ci.org/jxson/beardo
+[coverage-badge]: https://coveralls.io/repos/jxson/beardo/badge.svg?branch=
+[coverage-link]: https://coveralls.io/r/jxson/beardo?branch=
+[dependency-badge]: https://david-dm.org/jxson/beardo.png
+[dependency-link]: https://david-dm.org/jxson/beardo
