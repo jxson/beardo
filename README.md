@@ -1,55 +1,46 @@
 # beardo
 
-[![NPM](https://nodei.co/npm/beardo.png)](https://nodei.co/npm/beardo/)
+A layout aware utility for working with [mustache templates][mustache].
 
-> A mustache template utility for Node.js servers/ projects.
+[![build][travis-badge]][travis-link] [![coverage][coverage-badge]][coverage-link] [![dependencies][dependency-badge]][dependency-link]
 
-[![build][travis-badge]][travis-link]
-[![coverage][coverage-badge]][coverage-link]
-[![dependencies][dependency-badge]][dependency-link]
+The best mustaches were beards first. You can add files to a configurable templates directory and then use `beardo` to lazily and asynchronously read and render them as appropriate, including transitive partials and layouts.
 
-The best mustaches were beards first. The `beardo` module provides simple, layout aware APIs for working with [mustache templates][mustache]. Add your template files to a directory and use `beardo` to lazily and asynchronously read and render them as appropriate.
+Related modules:
 
-# Example: res.template()
-
-{{{ layout-content }}}
-
-Decorate the http `res` object with a [Templar][templar] compatible `res.template` method. [Etags][etag] and 304 responses will be automatically handled.
-
-    var beardo = require('beardo')
-      , http = require('http')
-      , path = require('path')
-      , options = { directory: path.resolve(__dirname, './templates') }
-
-    http.createServer(function(req, res){
-      res.template = beardo(req, res, options)
-
-      // Meanwhile you can render `templates/heyo.mustache` with an optional
-      // context object.
-      res.template('heyo', { foo: 'bar' })
-    })
+* beardo-res-template: create a template helper for responding to http requests.
 
 
-# Example: API usage
 
-You can use `beardo` directly to render templates in other contexts or if you don't want to decorate the res object:
+# Example
 
-    beardo(directory)
-    .render('my-template', { foo: 'bar' }, function(err, output){
+The default covers the basic use case.
+
+    var beardo = require('../')
+    var dir = './templates'
+    var template = beardo(dir)
+
+    template('aaaa', { foo: 'bar' }, function(err, output) {
       if (err) throw err
       console.log(output)
     })
 
-# Directory Structure
+## Directory Structure
 
-The directory that holds all the templates can be named whatever you want but at a minimum should contain a layouts subdirectory with a default.mustache file:
+The directory that holds all the templates can be named whatever you want but if you create a subdirectory named `layouts` it will have a special template variable available to it which will render the contents of a given template inside of it if the name of the template is in the context used to render the template.
+
+If you have a `layouts` subdirectory with a default.mustache file you can use the template variable `{{ layout-content }}`
 
     .
     └─ templates
         └─ layouts
             └─ default.mustache
 
-Layouts need to use the `yield` helper to render their contents properly. Additional templates can be added anywhere in the templates directory (even subdirectories) and can be refferenced as paritals from other templates by thier names (relative to the templates directory). See the [examples for some guidance][examples].
+The `templates/layouts/default.mustache` templates file that contains the following
+
+Would render
+
+Additional templates can be added anywhere in the templates directory (even subdirectories) and can be referenced as partials from other templates by their names (relative to the templates directory). See the [examples for some guidance][examples].
 
 # API
 
