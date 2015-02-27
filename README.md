@@ -4,182 +4,70 @@ A layout aware utility for working with [mustache templates][mustache].
 
 [![build][travis-badge]][travis-link] [![coverage][coverage-badge]][coverage-link] [![dependencies][dependency-badge]][dependency-link]
 
-The best mustaches were beards first. You can add files to a configurable templates directory and then use `beardo` to lazily and asynchronously read and render them as appropriate, including transitive partials and layouts.
+Add files to a configurable templates directory and then use the `beardo` module to lazily and asynchronously render them. Rendered output will include transitive partials and layouts automatically.
 
 Related modules:
 
-* beardo-res-template: create a template helper for responding to http requests.
-
-
+* beardo-http: create a template helper for responding to http requests.
 
 # Example
 
-The default covers the basic use case.
+To render a mustache template (including any partials) you can use a string name of the template relative to a templates directory (with or without the `.mustache` extension).
 
     var beardo = require('../')
     var dir = './templates'
     var template = beardo(dir)
+    var context = { username: 'jxson' }
 
-    template('aaaa', { foo: 'bar' }, function(err, output) {
+    template('user', context, function(err, output) {
       if (err) throw err
       console.log(output)
     })
 
+The directory that holds all the templates is entirely configurable. If you nest directories those individual templates can be referenced with a relative name. See the [example] for reference usage.
+
+## Layouts
+
+Layout support is built in by default, setting `context.layout` will wrap the layout around the template's output.
+
+    var context = {
+      layout: 'special',
+      username: 'jxson'
+    }
+
+    template('user', context, function(err, output) {
+      if (err) throw err
+      console.log(output)
+    })
+
+### Default layout
+
+It would be annoying to have to set the layout every time `template(...)` is called so it can be configured via `options.layout` when creating the template function.
+
+    var beardo = require('beardo')
+    var template = beardo({
+      dirname: './templates',
+      layout: 'default'
+    })
+    var context = { username: 'jxson' }
+
+    template('user', context, function(err, output) {
+      if (err) throw err
+      console.log(output)
+    })
+
+### Layout templates
+
+Any layout templates are expected to live in a `layouts` subdirectory and will have the special template variable `{{{ layout-content }}}`. If you are rendering HTML be sure to user the triple mustaches to prevent escaping.
+
+
 ## Directory Structure
 
-The directory that holds all the templates can be named whatever you want but if you create a subdirectory named `layouts` it will have a special template variable available to it which will render the contents of a given template inside of it if the name of the template is in the context used to render the template.
-
-If you have a `layouts` subdirectory with a default.mustache file you can use the template variable `{{ layout-content }}`
-
-    .
-    └─ templates
-        └─ layouts
-            └─ default.mustache
-
-The `templates/layouts/default.mustache` templates file that contains the following
-
-Would render
-
-Additional templates can be added anywhere in the templates directory (even subdirectories) and can be referenced as partials from other templates by their names (relative to the templates directory). See the [examples for some guidance][examples].
+Templates can be added anywhere in the templates directory (even subdirectories) and can be referenced as partials from other templates by their names (relative to the templates directory). See the [examples for some guidance][example].
 
 # API
 
     var beardo = require('beardo')
-
-## res.template = beardo(req, res, options)
-
-Decorate `res` with a template method for rendering mustache files templates in `options.directory`. This method will automatically handle [Etags][etag] and 304 responses.
-
-
-    var beardo = require('beardo')
-      , http = require('http')
-      , path = require('path')
-      , options = { directory: path.resolve(__dirname, './templates') }
-
-    http.createServer(function(req, res){
-      res.template = beardo(req, res, options)
-
-      // ...
-    })
-
-### res.template(name, [context], [statusCode])
-
-* `name`: The template name/location relative to the `options.directory`
-    * Type: `String`
-* `context`: the optional context object to pass to the templates. If you want to change or ignore layouts this is the place to do it.
-    * Type: `Object`
-    * Default: `{ layout: 'default' }`
-* `statusCode`: the optional http status code
-    * Type: `Number`
-    * Default: 200 or 304 if there is a matching if-none-match header for the previous response's Etag headers.
-
-Reads and renders all the necessary files (including layouts and partials) and by default will respond with the rendered output as `text/html` with a 200 ok.
-
-    res.template('heyo', { foo: 'bar' })
-
-To respond with a different `content-type` set the header before calling `res.template`:
-
-    res.setHeader('content-type', 'text/plain')
-    res.template('my-plain-text-template')
-
-Templates by default will be wrapped in `templates/layouts/default.mustache`. If you want to change the layout add it to the context object.
-
-    res.template('heyo', { foo: 'bar', layout: 'custom-layout' })
-
-Alternatively if you don't want a layout at all set it to `false`:
-
-    res.template('heyo', { layout: false })
-
-Note: Since beardo only works with mustache, template names get normalized in a way that makes appending '.mustache' to them unnecessary. For example these two calls will  effectively be the same: `res.template('vanilla')`, `res.template('vanilla.mustache')`
-
-## Standard beardo instance
-
-    var b = beardo(options)
-
-### Options
-
-* `directory`: The path to the directory where the templates reside. Even though there is a default you should explicitly set this value.
-    * Type: `path`
-    * Default: `process.cwd + '/templates'`
-* `cache`: Toggles the cacheing. Set to `false` if you want the templates re-read on every call to `b.render()` (ideal for development). By default this is set to `true` saving extra fs calls and template compilation for previously rendered templates.
-    * Type: `Boolean`
-    * Default: `true`
-
-## b.render(name, [context], callback)
-
-* `name`: The name/location relative to the `options.directory` of the template to render.
-    * Type: `String`
-* `context`: the optional context object to pass to the templates. If you want to change or ignore layouts this is the place to do it.
-    * Type: `Object`
-    * Default: `{ layout: 'default' }`
-* `callback`: The function that will be called when the output from the template is rendered.
-    * Type: `Function`
-    * Arguments: `(err, output)`, where output is the rendered contents of the template.
-
-Asynchronously render a template in `options.directory`.
-
-    beardo(directory)
-    .render('my-template', { foo: 'bar' }, function(err, output){
-      if (err) throw err
-      console.log(output)
-    })
-
-## b.add(name, content)
-
-* `name`: the name of the template being added
-    * Type: `String`
-* `content`: The content of the template
-    * Type: `String`
-
-Allows you to dynamically add templates that `beardo` can then render, this is handy for instances where you might have template data in other places that are not the `options.directory`
-
-    beardo(directory)
-    .add('user', '<p>hello {{ name }}</p>')
-    .render('user', { name: 'jxson' }, function(err, output){
-      if (err) return done(err)
-      console.log(output) // '<p>hello jxson</p>
-    })
-
-## b.bundle(callback)
-
-> Stability: 1 - Experimental
-
-* `callback`: A function that is called when the bundle is ready.
-    * Type: `Function`
-    * Arguments: `(err, data)` , where data is a string of JavaScript that is the pre-compiled templates and a function for rendering them.
-
-Asynchronously reads and pre-compiles all templates into a bundle of JS that can be loaded into a script tag and used client-side.
-
-    beardo(directory)
-    .bundle(function(err, data){
-      if (err) throw err
-
-      // Once the bundle is created you can drop it into a file (or respond
-      // to an http request with it's content)
-      var fs = require('fs')
-
-      fs.writeFile('templates.js', data, function (err) {
-        if (err) throw err
-        console.log('template bundle saved!')
-      })
-    })
-
-### window.template(name, [context])
-
-* `name`: The name of the template relative to the `options.directory`.
-    * Type: `String`
-* `context`: An optional context object to pass to the templates. Layouts are excluded from the bundle, if you think this should be changed please [create an issue][issues] with details on your use case.
-    * Type: `Object`
-    * Default: `{}`
-
-Once the template bundle is loaded into the client you can use `window.template(...)` to render templates in your client-side JS.
-
-    var rendered = window.template('hiya', { name: 'jxson' })
-
-    console.log(rendered)
-
-
-NOTE: The bundle is something I hacked in a while ago and found it incredibly useful. I am still churning on it and the client-side API though, if you have comments or feedback [please let me know][issues].
 
 # DEVELOPMENT
 
@@ -209,7 +97,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [mustache]: http://mustache.github.io
 [templar]: http://npmjs.org/package/templar
 [etag]: http://en.wikipedia.org/wiki/HTTP_ETag
-[examples]: https://github.com/jxson/beardo/tree/master/examples
+[example]: https://github.com/jxson/beardo/tree/master/examples
 [issues]: https://github.com/jxson/beardo/issues
 [pr]: https://github.com/jxson/beardo/pulls
 [twitter]: https://twitter.com/jxson
