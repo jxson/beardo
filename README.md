@@ -26,7 +26,13 @@ To render a mustache template (including any partials) you can use a string name
 
 The directory that holds all the templates is entirely configurable. If you nest directories those individual templates can be referenced with a relative name. See the [example] for reference usage.
 
-## Layouts
+# Install
+
+With npm
+
+    npm install beardo
+
+# More examples
 
 Layout support is built in by default, setting `context.layout` will wrap the layout around the template's output.
 
@@ -40,7 +46,7 @@ Layout support is built in by default, setting `context.layout` will wrap the la
       console.log(output)
     })
 
-### Default layout
+## Default layout
 
 It would be annoying to have to set the layout every time `template(...)` is called so it can be configured via `options.layout` when creating the template function.
 
@@ -56,18 +62,32 @@ It would be annoying to have to set the layout every time `template(...)` is cal
       console.log(output)
     })
 
-### Layout templates
+## Layout templates
 
-Any layout templates are expected to live in a `layouts` subdirectory and will have the special template variable `{{{ layout-content }}}`. If you are rendering HTML be sure to user the triple mustaches to prevent escaping.
+Any layout templates are expected to live in a `layouts` subdirectory and will have the special template variable `{{{ layout-content }}}`. If you are rendering HTML be sure to use the triple mustaches to prevent escaping.
 
 
 ## Directory Structure
 
 Templates can be added anywhere in the templates directory (even subdirectories) and can be referenced as partials from other templates by their names (relative to the templates directory). See the [examples for some guidance][example].
 
+
 # API
 
     var beardo = require('beardo')
+
+## var template = beardo(options = {} or dirname)
+
+Create a `template` method which wraps an instance of `beardo.ctor` configured to read templates from `dirname` or `options.dirname`. This `template` method is a convenience wrapper around `Beardo.prototype.render(...)`.
+
+## options
+
+In most cases only a `dirname` would be necessary. However if you need specific control over the default layout, caching or `stat` calls the following options can be passed into `var template = beardo(options)` or `var b = new beardo.Beardo(options)`.
+
+* `options.dirname` - `path`: defaults to `path.resolve('templates')`. The base directory to look up templates in. Template names are relative to this directory.
+* `options.layout` - `String`: defaults to `''`. This is the global default layout. If no layout is defined layout reading, and rendering will be skipped.
+* `options.cache` - `Object` max maxAge
+* `options.stat` - `Boolean`: defaults to `true`. Use `fs.stat` to check if a template file should be read or not. If set to `false` the first `fs.readFile` call will be cached and used on subsequent read/render calls.
 
 # DEVELOPMENT
 
