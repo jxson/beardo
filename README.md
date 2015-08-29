@@ -89,14 +89,37 @@ In most cases only a `dirname` would be necessary. However if you need specific 
 * `options.cache` - `Object` max maxAge
 * `options.stat` - `Boolean`: defaults to `true`. Use `fs.stat` to check if a template file should be read or not. If set to `false` the first `fs.readFile` call will be cached and used on subsequent read/render calls.
 
+## template(name, context, callback)
+
+context is optional
+
+    template('foo', context, function(err, output) {
+      if (err) throw err
+      console.log('output', output)
+    })
+
+SEE: b.render(...)
+
+## var b = new require('beardo').Beardo()
+
+Sometimes you want more than just the simplified `template(...)` function.
+
+## b.resolve()
+
+## b.get()
+
+## b.set()
+
+## b.render()
+
+## b.read()
+
 # DEVELOPMENT
 
-You can run the tests through standard npm commands.
+You can run the tests through standard npm commands (or through `make test`).
 
     $ npm install   # install dependencies
     $ npm test      # run the tests
-
-Currently there are no specific tests for the browser bundle, I approximate the environment in a standard test.
 
 # CONTRIBUTING
 
